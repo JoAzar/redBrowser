@@ -3,28 +3,25 @@ from PyQt5.QtCore import QUrl
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWebEngineWidgets import QWebEngineProfile, QWebEnginePage, QWebEngineView, QWebEngineSettings
 import re
+import os
+import sys
 
 class IncognitoWebEngineProfile(QWebEngineProfile):
-    """Clase personalizada para perfil de navegador en modo incógnito."""
+    """Perfil de navegador en modo incógnito."""
     def __init__(self, name, parent=None):
-        super().__init__(name, parent)
-        # Configuración de cookies y almacenamiento persistente
+        super().__init__(name, parent)  # Asegúrate de llamar al constructor de la clase base
         self.setPersistentCookiesPolicy(QWebEngineProfile.NoPersistentCookies)
         self.setPersistentStoragePath("")  # Usar un directorio vacío para almacenamiento persistente
-
 
 class AdBlockingWebEnginePage(QWebEnginePage):
     def __init__(self, profile, parent=None):
         super().__init__(profile, parent)
-        self.network_access_manager = self.webPage().networkAccessManager()
-        self.network_access_manager.finished.connect(self.on_request_finished)
         self.load_filter_lists()
 
     def load_filter_lists(self):
         self.filters = []
-        # Cargar filtros desde un archivo o URL
         try:
-            with open("/home/red/toolsR/filtros.txt", "r") as f:
+            with open("filters/filtros.txt", "r") as f:
                 self.filters = [line.strip() for line in f if line.strip()]
         except FileNotFoundError:
             print("Archivo de filtros no encontrado.")
@@ -36,21 +33,26 @@ class AdBlockingWebEnginePage(QWebEnginePage):
         new_page = AdBlockingWebEnginePage(self.profile(), self)
         return new_page
 
-class SimpleBrowser(QMainWindow):
+class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         
+        # Rutas de los iconos
+        base_dir = os.path.dirname(__file__)
+        back_icon_path = os.path.join(base_dir, 'icons', 'back.png')
+        forward_icon_path = os.path.join(base_dir, 'icons', 'forward.png')
+        browser_icon_path = os.path.join(base_dir, 'icons', 'iconoBrowser.ico')
+
         # Configurar perfil del navegador en modo incógnito
-        self.profile = IncognitoWebEngineProfile("IncognitoProfile", self)
-        
+        self.profile = IncognitoWebEngineProfile("IncognitoProfile")
+
         # Configurar vista del navegador
         self.browser = QWebEngineView()
-        self.browser.setPage(QWebEnginePage(self.profile, self))
-        ingreso = input("Ingrese su url (sin https): ")
-        self.browser.setUrl(QUrl("https://"+ingreso))  # Convertir la URL a QUrl
-
-        # Configurar opciones de privacidad
-        self.configure_privacy_settings()
+        self.browser.setPage(AdBlockingWebEnginePage(self.profile, self))
+        
+        # URL inicial
+        ingreso = input("Ingrese su URL (sin https): ")
+        self.browser.setUrl(QUrl("https://" + ingreso + ".com"))  # Convertir la URL a QUrl
 
         # Configurar barra de direcciones
         self.url_bar = QLineEdit()
@@ -59,11 +61,11 @@ class SimpleBrowser(QMainWindow):
 
         # Configurar botones de navegación
         self.back_button = QPushButton()
-        self.back_button.setIcon(QIcon("/home/red/toolsR/back.png"))
+        self.back_button.setIcon(QIcon(back_icon_path))
         self.back_button.clicked.connect(self.browser.back)
 
         self.forward_button = QPushButton()
-        self.forward_button.setIcon(QIcon("/home/red/toolsR/forward.png"))
+        self.forward_button.setIcon(QIcon(forward_icon_path))
         self.forward_button.clicked.connect(self.browser.forward)
 
         # Aplicar estilo QSS
@@ -82,34 +84,35 @@ class SimpleBrowser(QMainWindow):
         self.container = QWidget()
         self.container.setLayout(self.layout)
         self.setCentralWidget(self.container)
-        
+
         # Configurar ícono de la ventana
-        self.setWindowIcon(QIcon("/home/red/toolsR/app_icon.png"))  # Ajusta la ruta del ícono según sea necesario
+        self.setWindowIcon(QIcon(browser_icon_path))
         self.setWindowTitle("Red Browser")
         self.resize(1024, 768)
 
-        self.show()
+        # Configurar opciones de privacidad
+        self.configure_privacy_settings()
 
     def configure_privacy_settings(self):
         """Configura ajustes de privacidad en la vista del navegador."""
         settings = self.browser.settings()
-        settings.setAttribute(QWebEngineSettings.JavascriptEnabled, True)  # Desactivar JavaScript
-        settings.setAttribute(QWebEngineSettings.PluginsEnabled, True)  # Desactivar plugins
-        settings.setAttribute(QWebEngineSettings.LocalStorageEnabled, True)  # Desactivar almacenamiento local
-        settings.setAttribute(QWebEngineSettings.WebGLEnabled, True)  # Desactivar WebGL
-        settings.setAttribute(QWebEngineSettings.AutoLoadImages, True)  # Desactivar carga de imágenes
-        settings.setAttribute(QWebEngineSettings.LocalContentCanAccessRemoteUrls, True)
-        settings.setAttribute(QWebEngineSettings.SpatialNavigationEnabled, True)
+        settings.setAttribute(QWebEngineSettings.JavascriptEnabled, False)  # Desactivar JavaScript
+        settings.setAttribute(QWebEngineSettings.PluginsEnabled, False)  # Desactivar plugins
+        settings.setAttribute(QWebEngineSettings.LocalStorageEnabled, False)  # Desactivar almacenamiento local
+        settings.setAttribute(QWebEngineSettings.WebGLEnabled, False)  # Desactivar WebGL
+        settings.setAttribute(QWebEngineSettings.AutoLoadImages, False)  # Desactivar carga de imágenes
+        settings.setAttribute(QWebEngineSettings.LocalContentCanAccessRemoteUrls, False)
+        settings.setAttribute(QWebEngineSettings.SpatialNavigationEnabled, False)
         settings.setAttribute(QWebEngineSettings.ErrorPageEnabled, True)
-        settings.setAttribute(QWebEngineSettings.FullScreenSupportEnabled, True)
-        settings.setAttribute(QWebEngineSettings.Accelerated2dCanvasEnabled, True)
-        settings.setAttribute(QWebEngineSettings.AutoLoadIconsForPage, True)
-        settings.setAttribute(QWebEngineSettings.TouchIconsEnabled, True)
-        settings.setAttribute(QWebEngineSettings.FocusOnNavigationEnabled, True)
-        settings.setAttribute(QWebEngineSettings.PrintElementBackgrounds, True)
+        settings.setAttribute(QWebEngineSettings.FullScreenSupportEnabled, False)
+        settings.setAttribute(QWebEngineSettings.Accelerated2dCanvasEnabled, False)
+        settings.setAttribute(QWebEngineSettings.AutoLoadIconsForPage, False)
+        settings.setAttribute(QWebEngineSettings.TouchIconsEnabled, False)
+        settings.setAttribute(QWebEngineSettings.FocusOnNavigationEnabled, False)
+        settings.setAttribute(QWebEngineSettings.PrintElementBackgrounds, False)
         settings.setAttribute(QWebEngineSettings.ShowScrollBars, True)
         settings.setAttribute(QWebEngineSettings.DnsPrefetchEnabled, True)
-        settings.setAttribute(QWebEngineSettings.PdfViewerEnabled, True)
+        settings.setAttribute(QWebEngineSettings.PdfViewerEnabled, False)
 
     def navigate_to_url(self):
         url = self.url_bar.text()
@@ -143,6 +146,8 @@ class SimpleBrowser(QMainWindow):
             }
         """)
 
-app = QApplication([])
-window = SimpleBrowser()
-app.exec_()
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec_())
