@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLineEdit, QVBoxLayout, QWidget, QPushButton, QHBoxLayout
+from PyQt5.QtWidgets import QApplication, QMainWindow, QLineEdit, QVBoxLayout, QWidget, QPushButton, QHBoxLayout, QSpacerItem, QSizePolicy
 from PyQt5.QtCore import QUrl, Qt, QPoint
 from PyQt5.QtGui import QIcon, QMouseEvent
 from PyQt5.QtWebEngineWidgets import QWebEngineProfile, QWebEngineView, QWebEngineSettings
@@ -21,6 +21,9 @@ class MainWindow(QMainWindow):
         back_icon_path = os.path.join(base_dir, 'icons', 'back.png')
         forward_icon_path = os.path.join(base_dir, 'icons', 'forward.png')
         browser_icon_path = os.path.join(base_dir, 'icons', 'iconoBrowser.ico')
+        self.min_icon_path = os.path.join(base_dir, 'icons', 'min.png')
+        self.max_icon_path = os.path.join(base_dir, 'icons', 'max.png')         #los tres aun no se agregaron
+        self.close_icon_path = os.path.join(base_dir, 'icons', 'close.png')
 
         # Configurar perfil del navegador en modo incógnito
         self.profile = IncognitoWebEngineProfile("IncognitoProfile")
@@ -30,7 +33,7 @@ class MainWindow(QMainWindow):
 
         # URL inicial
         ingreso = input("Ingrese su URL (sin https): ")
-        self.browser.setUrl(QUrl("https://" + ingreso + ".com"))  # Convertir la URL a QUrl
+        self.browser.setUrl(QUrl("https://www."+ingreso+".com" ))  # Convertir la URL a QUrl
 
         # Configurar barra de direcciones
         self.url_bar = QLineEdit()
@@ -65,8 +68,8 @@ class MainWindow(QMainWindow):
         self.url_layout.addWidget(self.back_button)
         self.url_layout.addWidget(self.forward_button)
         self.url_layout.addWidget(self.url_bar)
-        self.url_layout.addWidget(self.theme_button)  # Añadir el botón de cambio de tema
-        self.layout.addWidget(self.title_bar)  # Agregar la barra de título
+        self.url_layout.addWidget(self.theme_button)    #Añadir el botón de cambio de tema
+        self.layout.addWidget(self.title_bar)           #Agregar la barra de título
         self.layout.addLayout(self.url_layout)
         self.layout.addWidget(self.browser)
 
@@ -76,29 +79,10 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.container)
 
         # Configurar la ventana para no mostrar la barra de título nativa
-        self.setWindowFlags(Qt.FramelessWindowHint)  # Ocultar la barra de título nativa
+        self.setWindowFlags(Qt.FramelessWindowHint)  #Ocultar la barra de título nativa
         self.setWindowIcon(QIcon(browser_icon_path))
         self.setWindowTitle("Red Browser")
         self.resize(1024, 768)
-
-        # Configurar la ventana para que tenga bordes redondeados
-        self.setStyleSheet("""
-            QMainWindow {
-                background-color: #fff;
-                border-radius: 30px;
-                border: 1px solid #ccc; /* Opcional: Añadir borde */
-            }
-            QWidget {
-                background-color: #fff;
-                border-radius: 30px; /* Aplicar el mismo radio de borde a los widgets */
-            }
-            QPushButton {
-                border-radius: 5px;
-            }
-            QLineEdit {
-                border-radius: 5px;
-            }
-        """)
 
         # Configurar opciones de privacidad
         self.configure_privacy_settings()
@@ -107,57 +91,64 @@ class MainWindow(QMainWindow):
         self.drag_pos = None
 
     def create_title_bar(self):
-        """Crea una barra de título personalizada."""
+        #Varra de título personalizada
         self.title_bar = QWidget()
-        self.title_bar.setFixedHeight(30)
+        self.title_bar.setFixedHeight(20)
         
         # Estilo de la barra de título
-        self.title_bar.setStyleSheet("background-color: #131313; color: white;")
+        self.title_bar.setStyleSheet("")    #por defecto blanco (marco superior)
 
-        # Botón de cerrar
-        self.close_button = QPushButton("X")
+       # Botón de cerrar
+        self.close_button = QPushButton()
+        self.close_button.setIcon(QIcon(self.close_icon_path))
         self.close_button.clicked.connect(self.close)
-        self.close_button.setStyleSheet("background-color: #ff3b30; color: white; border: none;")
-        self.close_button.setFixedSize(30, 30)
+        self.close_button.setStyleSheet("border: none;")
+        self.close_button.setFixedSize(30, 30)  # Ajusta el tamaño
 
         # Botón de minimizar
-        self.minimize_button = QPushButton("_")
+        self.minimize_button = QPushButton()
+        self.minimize_button.setIcon(QIcon(self.min_icon_path))
         self.minimize_button.clicked.connect(self.showMinimized)
-        self.minimize_button.setStyleSheet("background-color: #999; color: white; border: none;")
-        self.minimize_button.setFixedSize(30, 30)
+        self.minimize_button.setStyleSheet("border: none;")
+        self.minimize_button.setFixedSize(30, 30)  # Ajusta el tamaño
 
         # Botón de maximizar
-        self.maximize_button = QPushButton("[]")
+        self.maximize_button = QPushButton()
+        self.maximize_button.setIcon(QIcon(self.max_icon_path))
         self.maximize_button.clicked.connect(self.toggle_maximize)
-        self.maximize_button.setStyleSheet("background-color: #999; color: white; border: none;")
-        self.maximize_button.setFixedSize(30, 30)
+        self.maximize_button.setStyleSheet("border: none;")
+        self.maximize_button.setFixedSize(30, 30)  # Ajusta el tamaño
 
         # Layout de la barra de título
         self.title_layout = QHBoxLayout(self.title_bar)
+        self.title_layout.setContentsMargins(0, 0, 0, 0)
+        self.title_layout.setSpacing(0)
+
+        # Agrega un espaciador para alinear los botones a la derecha
+        self.spacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.title_layout.addItem(self.spacer)
         self.title_layout.addWidget(self.minimize_button)
         self.title_layout.addWidget(self.maximize_button)
         self.title_layout.addWidget(self.close_button)
-        self.title_layout.setContentsMargins(0, 0, 0, 0)
-        self.title_layout.setSpacing(0)
         
         # Agregar eventos de arrastre
         self.title_bar.mousePressEvent = self.mousePressEvent
         self.title_bar.mouseMoveEvent = self.mouseMoveEvent
 
+    #Maneja el evento de presionar el ratón para iniciar el arrastre
     def mousePressEvent(self, event: QMouseEvent):
-        """Maneja el evento de presionar el ratón para iniciar el arrastre."""
         if event.button() == Qt.LeftButton:
             self.drag_pos = event.globalPos() - self.frameGeometry().topLeft()
             event.accept()
 
+    #Maneja el evento de mover el ratón para arrastrar la ventana.
     def mouseMoveEvent(self, event: QMouseEvent):
-        """Maneja el evento de mover el ratón para arrastrar la ventana."""
         if self.drag_pos:
             self.move(event.globalPos() - self.drag_pos)
             event.accept()
 
+    #Alterna entre maximizar y restaurar la ventana
     def toggle_maximize(self):
-        """Alterna entre maximizar y restaurar la ventana."""
         if self.isMaximized():
             self.showNormal()
         else:
@@ -193,12 +184,13 @@ class MainWindow(QMainWindow):
     def update_url_bar(self, q):
         self.url_bar.setText(q.toString())
 
-    # Aplica estilos personalizados a los widgets.
+    # Aplica estilos personalizados a los widgets.  -> #NOTA QPushButton son los botones de maxi min y cerrar
     def apply_styles(self):
         if self.dark_mode:
             self.setStyleSheet("""
                 QMainWindow {
                     background-color: #131313;
+                    height: 50px;
                 }
                 QWidget {
                     background-color: #131313;
@@ -210,8 +202,8 @@ class MainWindow(QMainWindow):
                     border: 1px solid #555;
                     padding: 5px;
                     border-radius: 5px;
-                    min-width: 30px;
-                    min-height: 30px;
+                    min-width: 10px;
+                    min-height: 10px;
                 }
                 QPushButton:hover {
                     background-color: #444;
@@ -234,7 +226,7 @@ class MainWindow(QMainWindow):
         else:
             self.setStyleSheet("""
                 QMainWindow {
-                    background-color: #fff;
+                    background-color: #000;
                 }
                 QWidget {
                     background-color: #fff;
@@ -246,8 +238,8 @@ class MainWindow(QMainWindow):
                     border: 1px solid #ccc;
                     padding: 5px;
                     border-radius: 5px;
-                    min-width: 30px;
-                    min-height: 30px;
+                    min-width: 10px;
+                    min-height: 10px;
                 }
                 QPushButton:hover {
                     background-color: #f0f0f0;
