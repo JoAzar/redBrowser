@@ -16,24 +16,26 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        # Rutas de los iconos
+        #PATHS
         base_dir = os.path.dirname(__file__)
         back_icon_path = os.path.join(base_dir, 'icons', 'back.png')
         forward_icon_path = os.path.join(base_dir, 'icons', 'forward.png')
         browser_icon_path = os.path.join(base_dir, 'icons', 'iconoBrowser.ico')
-        self.min_icon_path = os.path.join(base_dir, 'icons', 'min.png')
-        self.max_icon_path = os.path.join(base_dir, 'icons', 'max.png')         #los tres aun no se agregaron
-        self.close_icon_path = os.path.join(base_dir, 'icons', 'close.png')
+        self.min_icon_path = os.path.join(base_dir, 'icons', 'min2.png')
+        self.max_icon_path = os.path.join(base_dir, 'icons', 'max3.png')         #los tres aun no se agregaron
+        self.close_icon_path = os.path.join(base_dir, 'icons', 'close2.png')
+        recharge_icon_path = os.path.join(base_dir, 'icons', 'recharge.png')
+        homepage_path = os.path.join(base_dir, 'homepage.html')
 
-        # Configurar perfil del navegador en modo incógnito
+        #Configurar perfil del navegador en modo incógnito
         self.profile = IncognitoWebEngineProfile("IncognitoProfile")
 
-        # Configurar vista del navegador
+        #Configurar vista del navegador
         self.browser = QWebEngineView()
 
-        # URL inicial
-        ingreso = input("Ingrese su URL (sin https): ")
-        self.browser.setUrl(QUrl("https://www."+ingreso+".com" ))  # Convertir la URL a QUrl
+        #Cargar la página de inicio
+        self.browser.setUrl(QUrl.fromLocalFile(homepage_path))
+        self.browser.setUrl(QUrl.fromLocalFile(homepage_path))
 
         # Configurar barra de direcciones
         self.url_bar = QLineEdit()
@@ -48,6 +50,11 @@ class MainWindow(QMainWindow):
         self.forward_button = QPushButton()
         self.forward_button.setIcon(QIcon(forward_icon_path))
         self.forward_button.clicked.connect(self.browser.forward)
+
+        # Botón de recarga
+        self.refresh_button = QPushButton()
+        self.refresh_button.setIcon(QIcon(recharge_icon_path))
+        self.refresh_button.clicked.connect(self.browser.reload)
 
         # Botón de cambio de tema
         self.theme_button = QPushButton("Modo Oscuro")
@@ -67,6 +74,7 @@ class MainWindow(QMainWindow):
         self.url_layout = QHBoxLayout()
         self.url_layout.addWidget(self.back_button)
         self.url_layout.addWidget(self.forward_button)
+        self.url_layout.addWidget(self.refresh_button)
         self.url_layout.addWidget(self.url_bar)
         self.url_layout.addWidget(self.theme_button)    #Añadir el botón de cambio de tema
         self.layout.addWidget(self.title_bar)           #Agregar la barra de título
@@ -103,21 +111,21 @@ class MainWindow(QMainWindow):
         self.close_button.setIcon(QIcon(self.close_icon_path))
         self.close_button.clicked.connect(self.close)
         self.close_button.setStyleSheet("border: none;")
-        self.close_button.setFixedSize(30, 30)  # Ajusta el tamaño
+        self.close_button.setFixedSize(40, 40)  # Ajusta el tamaño
 
         # Botón de minimizar
         self.minimize_button = QPushButton()
         self.minimize_button.setIcon(QIcon(self.min_icon_path))
         self.minimize_button.clicked.connect(self.showMinimized)
         self.minimize_button.setStyleSheet("border: none;")
-        self.minimize_button.setFixedSize(30, 30)  # Ajusta el tamaño
+        self.minimize_button.setFixedSize(40, 40)  # Ajusta el tamaño
 
         # Botón de maximizar
         self.maximize_button = QPushButton()
         self.maximize_button.setIcon(QIcon(self.max_icon_path))
         self.maximize_button.clicked.connect(self.toggle_maximize)
         self.maximize_button.setStyleSheet("border: none;")
-        self.maximize_button.setFixedSize(30, 30)  # Ajusta el tamaño
+        self.maximize_button.setFixedSize(40, 40)  # Ajusta el tamaño
 
         # Layout de la barra de título
         self.title_layout = QHBoxLayout(self.title_bar)

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        #search-form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #search-input {
+            padding: 10px;
+            font-size: 16px;
+            width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        #search-button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        #search-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body style="background-image: url('icons/iconoBrowser.png'); background-color: rgb(27, 27, 27); background-repeat: no-repeat; background-size: cover; background-position: center;">
+    <div id="search-form">
+        <input type="text" id="search-input" placeholder="Buscar en DuckDuckGo...">
+        <button id="search-button">Buscar</button>
+    </div>
+    <script>
+        document.getElementById('search-button').addEventListener('click', function() {
+            var query = document.getElementById('search-input').value;
+            if (query) {
+                window.location.href = 'https://duckduckgo.com/?q=' + encodeURIComponent(query);
+            }
+        });
+
+        document.getElementById('search-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                var query = document.getElementById('search-input').value;
+                if (query) {
+                    window.location.href = 'https://duckduckgo.com/?q=' + encodeURIComponent(query);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
