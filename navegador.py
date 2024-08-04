@@ -36,16 +36,12 @@ class MainWindow(QMainWindow):
 
         # Configurar vista del navegador
         self.browser = QWebEngineView()
-
-        # Cargar la página de inicio
         self.browser.setUrl(QUrl.fromLocalFile(homepage_path))
 
-        # Configurar barra de direcciones
         self.url_bar = QLineEdit()
         self.url_bar.returnPressed.connect(self.navigate_to_url)
         self.browser.urlChanged.connect(self.update_url_bar)
 
-        # Configurar botones de navegación
         self.back_button = QPushButton()
         self.back_button.setIcon(QIcon(self.back_icon_path))
         self.back_button.clicked.connect(self.browser.back)
@@ -54,7 +50,6 @@ class MainWindow(QMainWindow):
         self.forward_button.setIcon(QIcon(self.forward_icon_path))
         self.forward_button.clicked.connect(self.browser.forward)
 
-        # Botón de recarga
         self.refresh_button = QPushButton()
         self.refresh_button.setIcon(QIcon(recharge_icon_path))
         self.refresh_button.clicked.connect(self.browser.reload)
@@ -71,12 +66,15 @@ class MainWindow(QMainWindow):
         self.main_tool_bar = QToolBar("Main", self)
         self.main_tool_bar.setObjectName("MainToolBar")
 
+        # Agregar el botón de cambio de tema a la barra de herramientas
+        self.main_tool_bar.addWidget(self.theme_button)  # Añadir el botón a la barra de herramientas
+
         # Botón para mostrar/ocultar la barra de herramientas
         self.toggle_toolbar_button = QPushButton("Config")
         self.toggle_toolbar_button.clicked.connect(self.toggle_tool_bar)
-        self.toggle_toolbar_button.setToolTip("Mostrar/Ocultar la barra de herramientas")
+        self.toggle_toolbar_button.setToolTip("Herramientas")
 
-        # La barra de config inicia desactivada
+        # La barra de herramientas inicia visible
         self.main_tool_bar.setVisible(True)
 
         # Crear barra de título personalizada
@@ -92,11 +90,11 @@ class MainWindow(QMainWindow):
         self.url_layout.addWidget(self.forward_button)
         self.url_layout.addWidget(self.refresh_button)
         self.url_layout.addWidget(self.url_bar)
-        self.url_layout.addWidget(self.theme_button)    # Añadir el botón de cambio de tema
-        self.url_layout.addWidget(self.toggle_toolbar_button)
-        self.layout.addWidget(self.title_bar)           # Agregar la barra de título
-        self.layout.addWidget(self.main_tool_bar)
-        self.layout.addLayout(self.url_layout)
+        self.url_layout.addWidget(self.toggle_toolbar_button)  # Solo agregar el botón de configuración aquí
+
+        self.layout.addWidget(self.title_bar)  # Agregar la barra de título
+        self.layout.addWidget(self.main_tool_bar)  # Agregar la barra de herramientas
+        self.layout.addLayout(self.url_layout)  # La disposición de URL y el botón de configuración
         self.layout.addWidget(self.browser)
 
         self.main_tool_bar.setMinimumWidth(100)  # Establecer un ancho mínimo para la barra de herramientas
