@@ -1,7 +1,8 @@
-from PyQt5.QtWidgets import QAction, QApplication, QMainWindow, QLineEdit, QVBoxLayout, QWidget, QPushButton, QHBoxLayout, QSpacerItem, QSizePolicy, QToolBar
-from PyQt5.QtCore import QUrl, Qt, QPoint
-from PyQt5.QtGui import QIcon, QMouseEvent
-from PyQt5.QtWebEngineWidgets import QWebEngineProfile, QWebEngineView, QWebEngineSettings
+from PyQt6.QtWidgets import*
+from PyQt6.QtGui import*
+from PyQt6.QtCore import QUrl, Qt
+from PyQt6.QtWebEngineWidgets import*
+from PyQt6.QtWebEngineCore import*
 import os
 import sys
 
@@ -9,16 +10,14 @@ import sys
 class IncognitoWebEngineProfile(QWebEngineProfile):
     def __init__(self, name, parent=None):
         super().__init__(name, parent)
-        self.setPersistentCookiesPolicy(QWebEngineProfile.NoPersistentCookies)
+        self.setPersistentCookiesPolicy(QWebEngineProfile.PersistentCookiesPolicy.NoPersistentCookies)
         self.setPersistentStoragePath("")  # Usar un directorio vacío para almacenamiento persistente
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
-       
-
-        #PATHS
+        # PATHS
         base_dir = os.path.dirname(__file__)
         self.back_icon_path = os.path.join(base_dir, 'icons', 'back.png')
         self.forward_icon_path = os.path.join(base_dir, 'icons', 'forward.png')
@@ -32,14 +31,13 @@ class MainWindow(QMainWindow):
         option_icon_path = os.path.join(base_dir, 'icons', 'option.png')
         option_path = os.path.join(base_dir, 'option.html')
 
-        #Configurar perfil del navegador en modo incógnito
+        # Configurar perfil del navegador en modo incógnito
         self.profile = IncognitoWebEngineProfile("IncognitoProfile")
 
-        #Configurar vista del navegador
+        # Configurar vista del navegador
         self.browser = QWebEngineView()
 
-        #Cargar la página de inicio
-        self.browser.setUrl(QUrl.fromLocalFile(homepage_path))
+        # Cargar la página de inicio
         self.browser.setUrl(QUrl.fromLocalFile(homepage_path))
 
         # Configurar barra de direcciones
@@ -68,9 +66,17 @@ class MainWindow(QMainWindow):
         # Inicializar estado del tema
         self.dark_mode = False  # Asegúrate de definir el atributo `dark_mode`
 
-        #Botón para mostrar/ocultar la barra de herramientas
+        # Crear la barra de herramientas principal
+        self.main_tool_bar = QToolBar("Main", self)
+        self.main_tool_bar.setObjectName("MainToolBar")
+
+        # Botón para mostrar/ocultar la barra de herramientas
         self.toggle_toolbar_button = QPushButton("Config")
         self.toggle_toolbar_button.clicked.connect(self.toggle_tool_bar)
+        self.toggle_toolbar_button.setToolTip("Mostrar/Ocultar la barra de herramientas")
+
+        # La barra de config inicia desactivada
+        self.main_tool_bar.setVisible(True)
 
         # Crear barra de título personalizada
         self.create_title_bar()
@@ -85,12 +91,14 @@ class MainWindow(QMainWindow):
         self.url_layout.addWidget(self.forward_button)
         self.url_layout.addWidget(self.refresh_button)
         self.url_layout.addWidget(self.url_bar)
-        self.url_layout.addWidget(self.theme_button)    #Añadir el botón de cambio de tema
+        self.url_layout.addWidget(self.theme_button)    # Añadir el botón de cambio de tema
         self.url_layout.addWidget(self.toggle_toolbar_button)
-        self.layout.addWidget(self.title_bar)           #Agregar la barra de título
+        self.layout.addWidget(self.title_bar)           # Agregar la barra de título
+        self.layout.addWidget(self.main_tool_bar)
         self.layout.addLayout(self.url_layout)
         self.layout.addWidget(self.browser)
-        
+
+        self.main_tool_bar.setMinimumWidth(100)  # Establecer un ancho mínimo para la barra de herramientas
 
         # Configurar contenedor y ventana principal
         self.container = QWidget()
@@ -98,7 +106,7 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.container)
 
         # Configurar la ventana para no mostrar la barra de título nativa
-        self.setWindowFlags(Qt.FramelessWindowHint)  #Ocultar la barra de título nativa
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint)  # Ocultar la barra de título nativa
         self.setWindowIcon(QIcon(browser_icon_path))
         self.setWindowTitle("Red Browser")
         self.resize(1024, 768)
@@ -106,62 +114,27 @@ class MainWindow(QMainWindow):
         # Configurar opciones de privacidad
         self.configure_privacy_settings()
 
-        # Inicializar la barra de herramientas en estado oculto
-        self.tool_bars_visible = False
-
-        #Crear las barras de herramientas
-        self._createToolBars()
-
         # Variables para arrastrar ventana
         self.drag_pos = None
 
     def toggle_tool_bar(self):
-        edit_tool_bar = self.findChild(QToolBar, "Edit")
-        help_tool_bar = self.findChild(QToolBar, "Help")
-
-        if self.tool_bars_visible:
-            # Ocultar las barras de herramientas
-            if edit_tool_bar:
-                self.removeToolBar(edit_tool_bar)
-            if help_tool_bar:
-                self.removeToolBar(help_tool_bar)
-            self.toggle_toolbar_button.setText("Mostrar Barra de Herramientas")
+        # Alternar visibilidad de la barra de herramientas principal
+        if self.main_tool_bar.isVisible():
+            self.main_tool_bar.setVisible(False)
+            self.toggle_toolbar_button.setText("Mostrar")
         else:
-            # Mostrar las barras de herramientas
-            if edit_tool_bar:
-                self.addToolBar(edit_tool_bar)
-            if help_tool_bar:
-                self.addToolBar(Qt.LeftToolBarArea, help_tool_bar)
-            self.toggle_toolbar_button.setText("Ocultar Barra de Herramientas")
-
-        self.tool_bars_visible = not self.tool_bars_visible
-
-    def _createToolBars(self):
-        # Crear barra de herramientas de edición
-        editToolBar = QToolBar("Edit", self)
-        editToolBar.setObjectName("Edit")  # Asignar un nombre único
-        self.addToolBar(editToolBar)
-        # Agregar alguna acción a la barra de herramientas
-        edit_action = QAction(QIcon(self.back_icon_path), 'Edit Action', self)
-        editToolBar.addAction(edit_action)
-
-        # Crear barra de herramientas de ayuda
-        helpToolBar = QToolBar("Help", self)
-        helpToolBar.setObjectName("Help")  # Asignar un nombre único
-        self.addToolBar(Qt.LeftToolBarArea, helpToolBar)
-        # Agregar alguna acción a la barra de herramientas
-        help_action = QAction(QIcon(self.forward_icon_path), 'Help Action', self)
-        helpToolBar.addAction(help_action)
+            self.main_tool_bar.setVisible(True)
+            self.toggle_toolbar_button.setText("Ocultar")
 
     def create_title_bar(self):
-        #Varra de título personalizada
+        # Barra de título personalizada
         self.title_bar = QWidget()
         self.title_bar.setFixedHeight(20)
         
         # Estilo de la barra de título
-        self.title_bar.setStyleSheet("")    #por defecto blanco (marco superior)
+        self.title_bar.setStyleSheet("")  # por defecto blanco (marco superior)
 
-       # Botón de cerrar
+        # Botón de cerrar
         self.close_button = QPushButton()
         self.close_button.setIcon(QIcon(self.close_icon_path))
         self.close_button.clicked.connect(self.close)
@@ -188,7 +161,7 @@ class MainWindow(QMainWindow):
         self.title_layout.setSpacing(0)
 
         # Agrega un espaciador para alinear los botones a la derecha
-        self.spacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.spacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
         self.title_layout.addItem(self.spacer)
         self.title_layout.addWidget(self.minimize_button)
         self.title_layout.addWidget(self.maximize_button)
@@ -198,19 +171,19 @@ class MainWindow(QMainWindow):
         self.title_bar.mousePressEvent = self.mousePressEvent
         self.title_bar.mouseMoveEvent = self.mouseMoveEvent
 
-    #Maneja el evento de presionar el ratón para iniciar el arrastre
+    # Maneja el evento de presionar el ratón para iniciar el arrastre
     def mousePressEvent(self, event: QMouseEvent):
-        if event.button() == Qt.LeftButton:
-            self.drag_pos = event.globalPos() - self.frameGeometry().topLeft()
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.drag_pos = event.globalPosition().toPoint() - self.frameGeometry().topLeft()
             event.accept()
 
-    #Maneja el evento de mover el ratón para arrastrar la ventana.
+    # Maneja el evento de mover el ratón para arrastrar la ventana.
     def mouseMoveEvent(self, event: QMouseEvent):
         if self.drag_pos:
-            self.move(event.globalPos() - self.drag_pos)
+            self.move(event.globalPosition().toPoint() - self.drag_pos)
             event.accept()
 
-    #Alterna entre maximizar y restaurar la ventana
+    # Alterna entre maximizar y restaurar la ventana
     def toggle_maximize(self):
         if self.isMaximized():
             self.showNormal()
@@ -219,23 +192,24 @@ class MainWindow(QMainWindow):
 
     def configure_privacy_settings(self):
         settings = self.browser.settings()
-        settings.setAttribute(QWebEngineSettings.JavascriptEnabled, True)
-        settings.setAttribute(QWebEngineSettings.PluginsEnabled, True)
-        settings.setAttribute(QWebEngineSettings.LocalStorageEnabled, True)
-        settings.setAttribute(QWebEngineSettings.WebGLEnabled, True)
-        settings.setAttribute(QWebEngineSettings.AutoLoadImages, True)
-        settings.setAttribute(QWebEngineSettings.LocalContentCanAccessRemoteUrls, True)
-        settings.setAttribute(QWebEngineSettings.SpatialNavigationEnabled, True)
-        settings.setAttribute(QWebEngineSettings.ErrorPageEnabled, True)
-        settings.setAttribute(QWebEngineSettings.FullScreenSupportEnabled, True)
-        settings.setAttribute(QWebEngineSettings.Accelerated2dCanvasEnabled, True)
-        settings.setAttribute(QWebEngineSettings.AutoLoadIconsForPage, True)
-        settings.setAttribute(QWebEngineSettings.TouchIconsEnabled, True)
-        settings.setAttribute(QWebEngineSettings.FocusOnNavigationEnabled, True)
-        settings.setAttribute(QWebEngineSettings.PrintElementBackgrounds, True)
-        settings.setAttribute(QWebEngineSettings.ShowScrollBars, True)
-        settings.setAttribute(QWebEngineSettings.DnsPrefetchEnabled, True)
-        settings.setAttribute(QWebEngineSettings.PdfViewerEnabled, True)
+        settings.setAttribute(QWebEngineSettings.WebAttribute.JavascriptEnabled, True)
+        settings.setAttribute(QWebEngineSettings.WebAttribute.PluginsEnabled, True)
+        settings.setAttribute(QWebEngineSettings.WebAttribute.LocalStorageEnabled, True)
+        settings.setAttribute(QWebEngineSettings.WebAttribute.WebGLEnabled, True)
+        settings.setAttribute(QWebEngineSettings.WebAttribute.AutoLoadImages, True)
+        settings.setAttribute(QWebEngineSettings.WebAttribute.LocalContentCanAccessRemoteUrls, True)
+        settings.setAttribute(QWebEngineSettings.WebAttribute.SpatialNavigationEnabled, True)
+        settings.setAttribute(QWebEngineSettings.WebAttribute.ErrorPageEnabled, True)
+        settings.setAttribute(QWebEngineSettings.WebAttribute.FullScreenSupportEnabled, True)
+        settings.setAttribute(QWebEngineSettings.WebAttribute.Accelerated2dCanvasEnabled, True)
+        settings.setAttribute(QWebEngineSettings.WebAttribute.AutoLoadIconsForPage, True)
+        settings.setAttribute(QWebEngineSettings.WebAttribute.TouchIconsEnabled, True)
+        settings.setAttribute(QWebEngineSettings.WebAttribute.FocusOnNavigationEnabled, True)
+        settings.setAttribute(QWebEngineSettings.WebAttribute.PrintElementBackgrounds, True)
+        settings.setAttribute(QWebEngineSettings.WebAttribute.ShowScrollBars, True)
+        settings.setAttribute(QWebEngineSettings.WebAttribute.DnsPrefetchEnabled, True)
+        settings.setAttribute(QWebEngineSettings.WebAttribute.PdfViewerEnabled, True)
+        
 
     def navigate_to_url(self):
         url = self.url_bar.text()
@@ -253,7 +227,9 @@ class MainWindow(QMainWindow):
             self.setStyleSheet("""
                 QMainWindow {
                     background-color: #131313;
-                    height: 50px;
+                }
+                QToolBar {
+                    background-color: white;            
                 }
                 QWidget {
                     background-color: #131313;
@@ -332,4 +308,4 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = MainWindow()
     window.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

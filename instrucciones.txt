@@ -9,3 +9,11 @@ https://pypi.org/project/PyQt5/
 pip install PyQt5
 
 Para hacer cambios es recomendable leer la documentación de estas bibliotecas
+
+#ACTUALIZACION A PyQt6
+
+https://pypi.org/project/PyQt6/
+pip install PyQt6
+
+https://pypi.org/project/PyQt6-WebEngine/
+pip install PyQt6-WebEngine
