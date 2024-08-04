@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLineEdit, QVBoxLayout, QWidget, QPushButton, QHBoxLayout, QSpacerItem, QSizePolicy
+from PyQt5.QtWidgets import QAction, QApplication, QMainWindow, QLineEdit, QVBoxLayout, QWidget, QPushButton, QHBoxLayout, QSpacerItem, QSizePolicy, QToolBar
 from PyQt5.QtCore import QUrl, Qt, QPoint
 from PyQt5.QtGui import QIcon, QMouseEvent
 from PyQt5.QtWebEngineWidgets import QWebEngineProfile, QWebEngineView, QWebEngineSettings
@@ -16,16 +16,21 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
+       
+
         #PATHS
         base_dir = os.path.dirname(__file__)
-        back_icon_path = os.path.join(base_dir, 'icons', 'back.png')
-        forward_icon_path = os.path.join(base_dir, 'icons', 'forward.png')
+        self.back_icon_path = os.path.join(base_dir, 'icons', 'back.png')
+        self.forward_icon_path = os.path.join(base_dir, 'icons', 'forward.png')
         browser_icon_path = os.path.join(base_dir, 'icons', 'iconoBrowser.ico')
         self.min_icon_path = os.path.join(base_dir, 'icons', 'min2.png')
         self.max_icon_path = os.path.join(base_dir, 'icons', 'max3.png')         #los tres aun no se agregaron
         self.close_icon_path = os.path.join(base_dir, 'icons', 'close2.png')
         recharge_icon_path = os.path.join(base_dir, 'icons', 'recharge.png')
         homepage_path = os.path.join(base_dir, 'homepage.html')
+
+        option_icon_path = os.path.join(base_dir, 'icons', 'option.png')
+        option_path = os.path.join(base_dir, 'option.html')
 
         #Configurar perfil del navegador en modo incógnito
         self.profile = IncognitoWebEngineProfile("IncognitoProfile")
@@ -44,11 +49,11 @@ class MainWindow(QMainWindow):
 
         # Configurar botones de navegación
         self.back_button = QPushButton()
-        self.back_button.setIcon(QIcon(back_icon_path))
+        self.back_button.setIcon(QIcon(self.back_icon_path))
         self.back_button.clicked.connect(self.browser.back)
 
         self.forward_button = QPushButton()
-        self.forward_button.setIcon(QIcon(forward_icon_path))
+        self.forward_button.setIcon(QIcon(self.forward_icon_path))
         self.forward_button.clicked.connect(self.browser.forward)
 
         # Botón de recarga
@@ -62,6 +67,10 @@ class MainWindow(QMainWindow):
 
         # Inicializar estado del tema
         self.dark_mode = False  # Asegúrate de definir el atributo `dark_mode`
+
+        #Botón para mostrar/ocultar la barra de herramientas
+        self.toggle_toolbar_button = QPushButton("Config")
+        self.toggle_toolbar_button.clicked.connect(self.toggle_tool_bar)
 
         # Crear barra de título personalizada
         self.create_title_bar()
@@ -77,9 +86,11 @@ class MainWindow(QMainWindow):
         self.url_layout.addWidget(self.refresh_button)
         self.url_layout.addWidget(self.url_bar)
         self.url_layout.addWidget(self.theme_button)    #Añadir el botón de cambio de tema
+        self.url_layout.addWidget(self.toggle_toolbar_button)
         self.layout.addWidget(self.title_bar)           #Agregar la barra de título
         self.layout.addLayout(self.url_layout)
         self.layout.addWidget(self.browser)
+        
 
         # Configurar contenedor y ventana principal
         self.container = QWidget()
@@ -95,8 +106,52 @@ class MainWindow(QMainWindow):
         # Configurar opciones de privacidad
         self.configure_privacy_settings()
 
+        # Inicializar la barra de herramientas en estado oculto
+        self.tool_bars_visible = False
+
+        #Crear las barras de herramientas
+        self._createToolBars()
+
         # Variables para arrastrar ventana
         self.drag_pos = None
+
+    def toggle_tool_bar(self):
+        edit_tool_bar = self.findChild(QToolBar, "Edit")
+        help_tool_bar = self.findChild(QToolBar, "Help")
+
+        if self.tool_bars_visible:
+            # Ocultar las barras de herramientas
+            if edit_tool_bar:
+                self.removeToolBar(edit_tool_bar)
+            if help_tool_bar:
+                self.removeToolBar(help_tool_bar)
+            self.toggle_toolbar_button.setText("Mostrar Barra de Herramientas")
+        else:
+            # Mostrar las barras de herramientas
+            if edit_tool_bar:
+                self.addToolBar(edit_tool_bar)
+            if help_tool_bar:
+                self.addToolBar(Qt.LeftToolBarArea, help_tool_bar)
+            self.toggle_toolbar_button.setText("Ocultar Barra de Herramientas")
+
+        self.tool_bars_visible = not self.tool_bars_visible
+
+    def _createToolBars(self):
+        # Crear barra de herramientas de edición
+        editToolBar = QToolBar("Edit", self)
+        editToolBar.setObjectName("Edit")  # Asignar un nombre único
+        self.addToolBar(editToolBar)
+        # Agregar alguna acción a la barra de herramientas
+        edit_action = QAction(QIcon(self.back_icon_path), 'Edit Action', self)
+        editToolBar.addAction(edit_action)
+
+        # Crear barra de herramientas de ayuda
+        helpToolBar = QToolBar("Help", self)
+        helpToolBar.setObjectName("Help")  # Asignar un nombre único
+        self.addToolBar(Qt.LeftToolBarArea, helpToolBar)
+        # Agregar alguna acción a la barra de herramientas
+        help_action = QAction(QIcon(self.forward_icon_path), 'Help Action', self)
+        helpToolBar.addAction(help_action)
 
     def create_title_bar(self):
         #Varra de título personalizada
