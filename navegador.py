@@ -60,11 +60,12 @@ class MainWindow(QMainWindow):
         self.refresh_button.clicked.connect(self.browser.reload)
 
         # Botón de cambio de tema
-        self.theme_button = QPushButton("Modo Oscuro")
+        self.theme_button = QPushButton("Cambiar Color")
         self.theme_button.clicked.connect(self.toggle_theme)
 
-        # Inicializar estado del tema
-        self.dark_mode = False  # Asegúrate de definir el atributo `dark_mode`
+        # Inicializar estado del color de tema
+        self.dark_mode = False
+        self.pink_mode = False 
 
         # Crear la barra de herramientas principal
         self.main_tool_bar = QToolBar("Main", self)
@@ -223,7 +224,46 @@ class MainWindow(QMainWindow):
 
     # Aplica estilos personalizados a los widgets.  -> #NOTA QPushButton son los botones de maxi min y cerrar
     def apply_styles(self):
-        if self.dark_mode:
+        if self.pink_mode:
+            self.setStyleSheet("""
+                QMainWindow {
+                    background-color: #ff61c5;
+                }
+                QToolBar {
+                    background-color: #ffabe0;            
+                }
+                QWidget {
+                    background-color: #ffabe0;
+                    color: #eee;
+                }
+                QPushButton {
+                    background-color: #ffabe0;
+                    color: #eee;
+                    border: 1px solid #ffffff;
+                    padding: 5px;
+                    border-radius: 5px;
+                    min-width: 10px;
+                    min-height: 10px;
+                }
+                QPushButton:hover {
+                    background-color: #e0a0a0;
+                }
+                QPushButton:pressed {
+                    background-color: #d08080;
+                }
+                QLineEdit {
+                    padding: 5px;
+                    border: 1px solid #ffffff;
+                    border-radius: 5px;
+                    color: #eee;
+                    background-color: #f5c5c5;
+                }
+                QWidget#title_bar {
+                    background-color: #ffabe0;
+                }
+            """)
+            self.theme_button.setText("Modo Claro")
+        elif self.dark_mode:
             self.setStyleSheet("""
                 QMainWindow {
                     background-color: #131313;
@@ -301,7 +341,15 @@ class MainWindow(QMainWindow):
 
     # Cambia entre modo claro y oscuro.
     def toggle_theme(self):
-        self.dark_mode = not self.dark_mode
+        if self.pink_mode:
+            self.pink_mode = False
+            self.dark_mode = True
+        elif self.dark_mode:
+            self.dark_mode = False
+        else:
+            self.dark_mode = False
+            self.pink_mode = True
+
         self.apply_styles()
 
 if __name__ == '__main__':
