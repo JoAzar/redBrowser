@@ -262,7 +262,7 @@ class MainWindow(QMainWindow):
                     background-color: #ffabe0;
                 }
             """)
-            self.theme_button.setText("Modo Claro")
+            self.theme_button.setText("Modo Oscuro")
         elif self.dark_mode:
             self.setStyleSheet("""
                 QMainWindow {
@@ -337,7 +337,7 @@ class MainWindow(QMainWindow):
                     background-color: #fff;
                 }
             """)
-            self.theme_button.setText("Modo Oscuro")
+            self.theme_button.setText("Modo Pink")
 
     # Cambia entre modo claro y oscuro.
     def toggle_theme(self):
