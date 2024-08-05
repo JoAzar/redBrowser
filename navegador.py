@@ -30,7 +30,9 @@ class MainWindow(QMainWindow):
         self.hidden_icon_path = os.path.join(base_dir, 'icons', 'hidden.png')
         self.url_icon_path = os.path.join(base_dir, 'icons', 'redirect.png')
         self.url_icon_path_home = os.path.join(base_dir, 'icons', 'home.png')
-
+        self.modo_claro_icon_path = os.path.join(base_dir, 'icons', 'claro.png')
+        self.modo_oscuro_icon_path = os.path.join(base_dir, 'icons', 'oscuro.png')
+        self.modo_pink_icon_path = os.path.join(base_dir, 'icons', 'pink.png')
 
         # Configurar perfil del navegador en modo incógnito
         self.profile = IncognitoWebEngineProfile("IncognitoProfile")
@@ -45,38 +47,46 @@ class MainWindow(QMainWindow):
 
         self.back_button = QPushButton()
         self.back_button.setIcon(QIcon(self.back_icon_path))
+        self.back_button.setToolTip("Ir hacia atrás")
         self.back_button.clicked.connect(self.browser.back)
 
         self.forward_button = QPushButton()
         self.forward_button.setIcon(QIcon(self.forward_icon_path))
+        self.forward_button.setToolTip("Ir hacia adelante")
         self.forward_button.clicked.connect(self.browser.forward)
 
         self.refresh_button = QPushButton()
         self.refresh_button.setIcon(QIcon(self.recharge_icon_path))
+        self.refresh_button.setToolTip("Refrescar")
         self.refresh_button.clicked.connect(self.browser.reload)
 
         # Botón para mostrar/ocultar la barra de herramientas
         self.toggle_toolbar_button = QPushButton()
         self.toggle_toolbar_button.setIcon(QIcon(config_icon_path))
+        self.toggle_toolbar_button.setToolTip("Configuraciones")
         self.toggle_toolbar_button.clicked.connect(self.toggle_tool_bar)
 
         # Botón de cambio de tema
         self.theme_button = QPushButton("")
+        self.theme_button.setToolTip("Cambiar color")
         self.theme_button.clicked.connect(self.toggle_theme)
 
         # Botón de refrescar página en toolbar oculta
         self.refresh_button_toolbar = QPushButton("")
+        self.refresh_button_toolbar.setToolTip("Refrescar")
         self.refresh_button_toolbar.setIcon(QIcon(self.recharge_icon_path))
         self.refresh_button_toolbar.clicked.connect(self.browser.reload)
 
         # Botón de redirección url IA
         self.redirect_button_toolbar = QPushButton("")
-        self.redirect_button_toolbar.setIcon(QIcon(self.url_icon_path))             # Usa el ícono que prefieras
+        self.redirect_button_toolbar.setToolTip("Crear imágen con IA")
+        self.redirect_button_toolbar.setIcon(QIcon(self.url_icon_path))
         self.redirect_button_toolbar.clicked.connect(self.redirect_to_page)
 
         # Botón de redirección url HOMEPAGE
         self.home_redirect_button_toolbar = QPushButton("")
-        self.home_redirect_button_toolbar.setIcon(QIcon(self.url_icon_path_home))   # Usa el ícono que prefieras
+        self.home_redirect_button_toolbar.setToolTip("Volver al Inicio")
+        self.home_redirect_button_toolbar.setIcon(QIcon(self.url_icon_path_home))
         self.home_redirect_button_toolbar.clicked.connect(self.redirect_to_page_home)
 
         # Inicializar estado del color de tema
@@ -196,19 +206,6 @@ class MainWindow(QMainWindow):
             self.drag_pos = event.globalPosition().toPoint() - self.frameGeometry().topLeft()
             event.accept()
 
-    # Maneja el evento de mover el ratón para arrastrar la ventana.
-    def mouseMoveEvent(self, event: QMouseEvent):
-        if self.drag_pos:
-            self.move(event.globalPosition().toPoint() - self.drag_pos)
-            event.accept()
-
-    # Alterna entre maximizar y restaurar la ventana
-    def toggle_maximize(self):
-        if self.isMaximized():
-            self.showNormal()
-        else:
-            self.showMaximized()
-
     def configure_privacy_settings(self):
         settings = self.browser.settings()
         settings.setAttribute(QWebEngineSettings.WebAttribute.JavascriptEnabled, True)
@@ -247,6 +244,11 @@ class MainWindow(QMainWindow):
                 QMainWindow {
                     background-color: #ff61c5;
                 }
+                QToolTip {
+                    background-color: white;
+                    color: black;
+                    border: 1px solid black;
+                }
                 QToolBar {
                     background-color: #ffabe0;
                 }
@@ -281,14 +283,23 @@ class MainWindow(QMainWindow):
                 }
 
             """)
-            self.theme_button.setText("Modo Oscuro")
+            self.theme_button.setIcon(QIcon(self.modo_oscuro_icon_path))
         elif self.dark_mode:
             self.setStyleSheet("""
                 QMainWindow {
                     background-color: #131313;
                 }
-                QToolBar {
-                    background-color: white;            
+                QToolTip {
+                    background-color: white;
+                    color: #eee;
+                    border: 1px solid black;
+                    padding: 5px;
+                    border-radius: 30px;
+                }
+                QToolTip {
+                    background-color: white;
+                    color: black;
+                    border: 1px solid black;
                 }
                 QWidget {
                     background-color: #131313;
@@ -321,11 +332,16 @@ class MainWindow(QMainWindow):
                     background-color: #131313;
                 }
             """)
-            self.theme_button.setText("Modo Claro")
+            self.theme_button.setIcon(QIcon(self.modo_claro_icon_path))
         else:
             self.setStyleSheet("""
                 QMainWindow {
                     background-color: #000;
+                }
+                QToolTip {
+                    background-color: white;
+                    color: black;
+                    border: 1px solid black;
                 }
                 QWidget {
                     background-color: #fff;
@@ -355,7 +371,7 @@ class MainWindow(QMainWindow):
                     background-color: #fff;
                 }
             """)
-            self.theme_button.setText("Modo Pink")
+            self.theme_button.setIcon(QIcon(self.modo_pink_icon_path))
 
     # Cambia entre modo claro y oscuro.
     def toggle_theme(self):
