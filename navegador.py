@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import*
 from PyQt6.QtGui import*
-from PyQt6.QtCore import QUrl, Qt
+from PyQt6.QtCore import*
 from PyQt6.QtWebEngineWidgets import*
 from PyQt6.QtWebEngineCore import*
 import os
@@ -11,7 +11,7 @@ class IncognitoWebEngineProfile(QWebEngineProfile):
     def __init__(self, name, parent=None):
         super().__init__(name, parent)
         self.setPersistentCookiesPolicy(QWebEngineProfile.PersistentCookiesPolicy.NoPersistentCookies)
-        self.setPersistentStoragePath("")  # Usar un directorio vacío para almacenamiento persistente
+        self.setPersistentStoragePath("") 
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -21,7 +21,7 @@ class MainWindow(QMainWindow):
         base_dir = os.path.dirname(__file__)
         self.back_icon_path = os.path.join(base_dir, 'icons', 'back.png')
         self.forward_icon_path = os.path.join(base_dir, 'icons', 'forward.png')
-        browser_icon_path = os.path.join(base_dir, 'icons', 'iconoBrowser.ico')
+        self.browser_icon_path = os.path.join(base_dir, 'icons', 'iconoBrowser.ico')
         self.min_icon_path = os.path.join(base_dir, 'icons', 'min2.png')
         self.max_icon_path = os.path.join(base_dir, 'icons', 'max3.png')         #los tres aun no se agregaron
         self.close_icon_path = os.path.join(base_dir, 'icons', 'close2.png')
@@ -73,12 +73,12 @@ class MainWindow(QMainWindow):
 
         # Botón de redirección url IA
         self.redirect_button_toolbar = QPushButton("")
-        self.redirect_button_toolbar.setIcon(QIcon(self.url_icon_path))  # Usa el ícono que prefieras
+        self.redirect_button_toolbar.setIcon(QIcon(self.url_icon_path))             # Usa el ícono que prefieras
         self.redirect_button_toolbar.clicked.connect(self.redirect_to_page)
 
         # Botón de redirección url HOMEPAGE
         self.home_redirect_button_toolbar = QPushButton("")
-        self.home_redirect_button_toolbar.setIcon(QIcon(self.url_icon_path_home))  # Usa el ícono que prefieras
+        self.home_redirect_button_toolbar.setIcon(QIcon(self.url_icon_path_home))   # Usa el ícono que prefieras
         self.home_redirect_button_toolbar.clicked.connect(self.redirect_to_page_home)
 
         # Inicializar estado del color de tema
@@ -88,9 +88,10 @@ class MainWindow(QMainWindow):
         # Crear la barra de herramientas principal
         self.main_tool_bar = QToolBar("Main", self)
         self.main_tool_bar.setObjectName("MainToolBar")
+        self.main_tool_bar.setOrientation(Qt.Orientation.Vertical)          #orientación de la barra config en vertical
 
         # Agregar el botón de cambio de tema a la barra de herramientas
-        self.main_tool_bar.addWidget(self.theme_button)                 #Añadir el botones a la barra de herramientas
+        self.main_tool_bar.addWidget(self.theme_button)                     #Añadir el botones a la barra de herramientas
         self.main_tool_bar.addWidget(self.refresh_button_toolbar)
         self.main_tool_bar.addWidget(self.redirect_button_toolbar)
         self.main_tool_bar.addWidget(self.home_redirect_button_toolbar) 
@@ -105,34 +106,48 @@ class MainWindow(QMainWindow):
         self.apply_styles()
 
         # Configurar diseño
-        self.layout = QVBoxLayout()
+        self.main_layout = QHBoxLayout()                    # Usar un diseño horizontal para organizar la barra de herramientas y el contenido
+
+        # Configurar el contenido principal
+        self.content_layout = QVBoxLayout()                 # Diseño vertical para el contenido principal
         self.url_layout = QHBoxLayout()
+
         self.url_layout.addWidget(self.back_button)
         self.url_layout.addWidget(self.forward_button)
         self.url_layout.addWidget(self.refresh_button)
         self.url_layout.addWidget(self.url_bar)
-        self.url_layout.addWidget(self.toggle_toolbar_button)  # Solo agregar el botón de configuración aquí
+        self.url_layout.addWidget(self.toggle_toolbar_button)
 
-        self.layout.addWidget(self.title_bar)  # Agregar la barra de título
-        self.layout.addWidget(self.main_tool_bar)  # Agregar la barra de herramientas
-        self.layout.addLayout(self.url_layout)  # La disposición de URL y el botón de configuración
-        self.layout.addWidget(self.browser)
+        self.content_layout.addWidget(self.title_bar)       # Agregar la barra de título
+        self.content_layout.addLayout(self.url_layout)      # La disposición de URL y el botón de configuración
+        self.content_layout.addWidget(self.browser)         # Agregar el navegador
 
-        self.main_tool_bar.setMinimumWidth(100)  # Establecer un ancho mínimo para la barra de herramientas
+        # Agregar la barra de herramientas vertical a la derecha
+        self.config_bar = QVBoxLayout()
+        self.config_bar.addWidget(self.main_tool_bar)
+
+        # Añadir el contenido principal y la barra de herramientas al diseño principal
+        self.main_layout.addLayout(self.content_layout) 
+        self.main_layout.addLayout(self.config_bar)  
 
         # Configurar contenedor y ventana principal
         self.container = QWidget()
-        self.container.setLayout(self.layout)
+        self.container.setLayout(self.main_layout)
         self.setCentralWidget(self.container)
 
         # Configurar la ventana para no mostrar la barra de título nativa
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint)  # Ocultar la barra de título nativa
-        self.setWindowIcon(QIcon(browser_icon_path))
+        self.setWindowIcon(QIcon(self.browser_icon_path))
         self.setWindowTitle("Red Browser")
-        self.resize(1024, 768)
+
+        largo = 1024
+        ancho = 860
+        self.resize(largo, ancho)
 
         # Configurar opciones de privacidad
         self.configure_privacy_settings()
+
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
 
         # Variables para arrastrar ventana
         self.drag_pos = None
@@ -154,33 +169,30 @@ class MainWindow(QMainWindow):
             self.toggle_toolbar_button.setIcon(QIcon(self.visible_icon_path))
 
     def create_title_bar(self):
-        # Barra de título personalizada
         self.title_bar = QWidget()
         self.title_bar.setFixedHeight(20)
-        
-        # Estilo de la barra de título
-        self.title_bar.setStyleSheet("")  # por defecto blanco (marco superior)
+        self.title_bar.setStyleSheet("")
 
         # Botón de cerrar
         self.close_button = QPushButton()
         self.close_button.setIcon(QIcon(self.close_icon_path))
         self.close_button.clicked.connect(self.close)
         self.close_button.setStyleSheet("border: none;")
-        self.close_button.setFixedSize(40, 40)  # Ajusta el tamaño
+        self.close_button.setFixedSize(20, 20)  # Ajusta el tamaño
 
         # Botón de minimizar
         self.minimize_button = QPushButton()
         self.minimize_button.setIcon(QIcon(self.min_icon_path))
         self.minimize_button.clicked.connect(self.showMinimized)
         self.minimize_button.setStyleSheet("border: none;")
-        self.minimize_button.setFixedSize(40, 40)  # Ajusta el tamaño
+        self.minimize_button.setFixedSize(20, 20)  # Ajusta el tamaño
 
         # Botón de maximizar
         self.maximize_button = QPushButton()
         self.maximize_button.setIcon(QIcon(self.max_icon_path))
         self.maximize_button.clicked.connect(self.toggle_maximize)
         self.maximize_button.setStyleSheet("border: none;")
-        self.maximize_button.setFixedSize(40, 40)  # Ajusta el tamaño
+        self.maximize_button.setFixedSize(20, 20)  # Ajusta el tamaño
 
         # Layout de la barra de título
         self.title_layout = QHBoxLayout(self.title_bar)
@@ -272,10 +284,10 @@ class MainWindow(QMainWindow):
                     min-height: 10px;
                 }
                 QPushButton:hover {
-                    background-color: #525252;
+                    background-color:   #ffcfcf;
                 }
                 QPushButton:pressed {
-                    background-color: #d08080;
+                    background-color:   #ffcfcf;
                 }
                 QLineEdit {
                     padding: 5px;
@@ -311,10 +323,11 @@ class MainWindow(QMainWindow):
                     min-height: 10px;
                 }
                 QPushButton:hover {
-                    background-color: #525252;
+                    background-color:   #ffffff;
+                    color: black;
                 }
                 QPushButton:pressed {
-                    background-color: #555;
+                    background-color:   #ffffff;
                 }
                 QLineEdit {
                     padding: 5px;
@@ -336,7 +349,7 @@ class MainWindow(QMainWindow):
                 QWidget {
                     background-color: #fff;
                     color: #000;
-                }
+                }             
                 QPushButton {
                     background-color: #fff;
                     color: #000;
@@ -347,10 +360,8 @@ class MainWindow(QMainWindow):
                     min-height: 10px;
                 }
                 QPushButton:hover {
-                    background-color: #525252;
-                }
-                QPushButton:pressed {
-                    background-color: #e0e0e0;
+                    background-color:  #686868;
+                    color:  #ffffff;
                 }
                 QLineEdit {
                     padding: 5px;
