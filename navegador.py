@@ -25,11 +25,11 @@ class MainWindow(QMainWindow):
         self.min_icon_path = os.path.join(base_dir, 'icons', 'min2.png')
         self.max_icon_path = os.path.join(base_dir, 'icons', 'max3.png')         #los tres aun no se agregaron
         self.close_icon_path = os.path.join(base_dir, 'icons', 'close2.png')
-        recharge_icon_path = os.path.join(base_dir, 'icons', 'recharge.png')
+        self.recharge_icon_path = os.path.join(base_dir, 'icons', 'recharge.png')
         homepage_path = os.path.join(base_dir, 'homepage.html')
-
-        option_icon_path = os.path.join(base_dir, 'icons', 'option.png')
-        option_path = os.path.join(base_dir, 'option.html')
+        config_icon_path = os.path.join(base_dir, 'icons', 'config.png')
+        self.visible_icon_path = os.path.join(base_dir, 'icons', 'visible.png')
+        self.hidden_icon_path =os.path.join(base_dir, 'icons', 'hidden.png')
 
         # Configurar perfil del navegador en modo incógnito
         self.profile = IncognitoWebEngineProfile("IncognitoProfile")
@@ -51,12 +51,20 @@ class MainWindow(QMainWindow):
         self.forward_button.clicked.connect(self.browser.forward)
 
         self.refresh_button = QPushButton()
-        self.refresh_button.setIcon(QIcon(recharge_icon_path))
+        self.refresh_button.setIcon(QIcon(self.recharge_icon_path))
         self.refresh_button.clicked.connect(self.browser.reload)
 
+        # Botón para mostrar/ocultar la barra de herramientas
+        self.toggle_toolbar_button = QPushButton()
+        self.toggle_toolbar_button.setIcon(QIcon(config_icon_path))
+        self.toggle_toolbar_button.clicked.connect(self.toggle_tool_bar)
+
         # Botón de cambio de tema
-        self.theme_button = QPushButton("Cambiar Color")
+        self.theme_button = QPushButton("")
         self.theme_button.clicked.connect(self.toggle_theme)
+
+        self.refresh_button2 = QPushButton("")
+
 
         # Inicializar estado del color de tema
         self.dark_mode = False
@@ -68,11 +76,7 @@ class MainWindow(QMainWindow):
 
         # Agregar el botón de cambio de tema a la barra de herramientas
         self.main_tool_bar.addWidget(self.theme_button)  # Añadir el botón a la barra de herramientas
-
-        # Botón para mostrar/ocultar la barra de herramientas
-        self.toggle_toolbar_button = QPushButton("Config")
-        self.toggle_toolbar_button.clicked.connect(self.toggle_tool_bar)
-        self.toggle_toolbar_button.setToolTip("Herramientas")
+        self.main_tool_bar.addWidget(self.refresh_button2)
 
         # La barra de herramientas inicia visible
         self.main_tool_bar.setVisible(True)
@@ -116,14 +120,13 @@ class MainWindow(QMainWindow):
         # Variables para arrastrar ventana
         self.drag_pos = None
 
-    def toggle_tool_bar(self):
-        # Alternar visibilidad de la barra de herramientas principal
+    def toggle_tool_bar(self):  # Alternar visibilidad de la barra de herramientas principal
         if self.main_tool_bar.isVisible():
             self.main_tool_bar.setVisible(False)
-            self.toggle_toolbar_button.setText("Mostrar")
+            self.toggle_toolbar_button.setIcon(QIcon(self.hidden_icon_path))
         else:
             self.main_tool_bar.setVisible(True)
-            self.toggle_toolbar_button.setText("Ocultar")
+            self.toggle_toolbar_button.setIcon(QIcon(self.visible_icon_path))
 
     def create_title_bar(self):
         # Barra de título personalizada
@@ -228,32 +231,32 @@ class MainWindow(QMainWindow):
                     background-color: #ff61c5;
                 }
                 QToolBar {
-                    background-color: #ffabe0;            
+                    background-color: #ffabe0;           
                 }
                 QWidget {
                     background-color: #ffabe0;
-                    color: #eee;
+                    color: #78596e;
                 }
                 QPushButton {
                     background-color: #ffabe0;
                     color: #eee;
-                    border: 1px solid #ffffff;
+                    border: 1px solid #78596e;
                     padding: 5px;
                     border-radius: 5px;
                     min-width: 10px;
                     min-height: 10px;
                 }
                 QPushButton:hover {
-                    background-color: #e0a0a0;
+                    background-color: #525252;
                 }
                 QPushButton:pressed {
                     background-color: #d08080;
                 }
                 QLineEdit {
                     padding: 5px;
-                    border: 1px solid #ffffff;
+                    border: 1px solid #78596e;
                     border-radius: 5px;
-                    color: #eee;
+                    color: #78596e;
                     background-color: #f5c5c5;
                 }
                 QWidget#title_bar {
@@ -283,7 +286,7 @@ class MainWindow(QMainWindow):
                     min-height: 10px;
                 }
                 QPushButton:hover {
-                    background-color: #444;
+                    background-color: #525252;
                 }
                 QPushButton:pressed {
                     background-color: #555;
@@ -319,7 +322,7 @@ class MainWindow(QMainWindow):
                     min-height: 10px;
                 }
                 QPushButton:hover {
-                    background-color: #f0f0f0;
+                    background-color: #525252;
                 }
                 QPushButton:pressed {
                     background-color: #e0e0e0;
