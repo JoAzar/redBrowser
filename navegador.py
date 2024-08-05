@@ -22,11 +22,9 @@ class MainWindow(QMainWindow):
         self.back_icon_path = os.path.join(base_dir, 'icons', 'back.png')
         self.forward_icon_path = os.path.join(base_dir, 'icons', 'forward.png')
         self.browser_icon_path = os.path.join(base_dir, 'icons', 'iconoBrowser.ico')
-        self.min_icon_path = os.path.join(base_dir, 'icons', 'min2.png')
-        self.max_icon_path = os.path.join(base_dir, 'icons', 'max3.png')         #los tres aun no se agregaron
-        self.close_icon_path = os.path.join(base_dir, 'icons', 'close2.png')
         self.recharge_icon_path = os.path.join(base_dir, 'icons', 'recharge.png')
         homepage_path = os.path.join(base_dir, 'homepage.html')
+        #error_404_path = os.path.join(base_dir, 'notFound.html') #aun no implementado
         config_icon_path = os.path.join(base_dir, 'icons', 'config.png')
         self.visible_icon_path = os.path.join(base_dir, 'icons', 'visible.png')
         self.hidden_icon_path = os.path.join(base_dir, 'icons', 'hidden.png')
@@ -135,8 +133,7 @@ class MainWindow(QMainWindow):
         self.container.setLayout(self.main_layout)
         self.setCentralWidget(self.container)
 
-        # Configurar la ventana para no mostrar la barra de título nativa
-        self.setWindowFlags(Qt.WindowType.FramelessWindowHint)  # Ocultar la barra de título nativa
+        app.setStyle("Fusion")
         self.setWindowIcon(QIcon(self.browser_icon_path))
         self.setWindowTitle("Red Browser")
 
@@ -156,6 +153,13 @@ class MainWindow(QMainWindow):
         new_url = "https://www.bing.com/images/create"
         self.browser.setUrl(QUrl(new_url))
 
+    def handle_load_finished(self, ok):
+        if not ok:
+            print("Error al cargar la página")
+            self.redirect_to_page_404()
+        else:
+            print("Página cargada correctamente")
+
     def redirect_to_page_home(self): # Define la URL a la que quieres redirigir
         new_url = QUrl.fromLocalFile(os.path.join(os.path.dirname(__file__), 'homepage.html'))
         self.browser.setUrl(new_url)
@@ -170,29 +174,8 @@ class MainWindow(QMainWindow):
 
     def create_title_bar(self):
         self.title_bar = QWidget()
-        self.title_bar.setFixedHeight(20)
+        self.title_bar.setFixedHeight(0) #altura del margen superior
         self.title_bar.setStyleSheet("")
-
-        # Botón de cerrar
-        self.close_button = QPushButton()
-        self.close_button.setIcon(QIcon(self.close_icon_path))
-        self.close_button.clicked.connect(self.close)
-        self.close_button.setStyleSheet("border: none;")
-        self.close_button.setFixedSize(20, 20)  # Ajusta el tamaño
-
-        # Botón de minimizar
-        self.minimize_button = QPushButton()
-        self.minimize_button.setIcon(QIcon(self.min_icon_path))
-        self.minimize_button.clicked.connect(self.showMinimized)
-        self.minimize_button.setStyleSheet("border: none;")
-        self.minimize_button.setFixedSize(20, 20)  # Ajusta el tamaño
-
-        # Botón de maximizar
-        self.maximize_button = QPushButton()
-        self.maximize_button.setIcon(QIcon(self.max_icon_path))
-        self.maximize_button.clicked.connect(self.toggle_maximize)
-        self.maximize_button.setStyleSheet("border: none;")
-        self.maximize_button.setFixedSize(20, 20)  # Ajusta el tamaño
 
         # Layout de la barra de título
         self.title_layout = QHBoxLayout(self.title_bar)
@@ -200,11 +183,8 @@ class MainWindow(QMainWindow):
         self.title_layout.setSpacing(0)
 
         # Agrega un espaciador para alinear los botones a la derecha
-        self.spacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+        self.spacer = QSpacerItem(20, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
         self.title_layout.addItem(self.spacer)
-        self.title_layout.addWidget(self.minimize_button)
-        self.title_layout.addWidget(self.maximize_button)
-        self.title_layout.addWidget(self.close_button)
         
         # Agregar eventos de arrastre
         self.title_bar.mousePressEvent = self.mousePressEvent
@@ -268,7 +248,7 @@ class MainWindow(QMainWindow):
                     background-color: #ff61c5;
                 }
                 QToolBar {
-                    background-color: #ffabe0;           
+                    background-color: #ffabe0;
                 }
                 QWidget {
                     background-color: #ffabe0;
@@ -284,10 +264,10 @@ class MainWindow(QMainWindow):
                     min-height: 10px;
                 }
                 QPushButton:hover {
-                    background-color:   #ffcfcf;
+                    background-color: #ffcfcf;
                 }
                 QPushButton:pressed {
-                    background-color:   #ffcfcf;
+                    background-color: #ffcfcf;
                 }
                 QLineEdit {
                     padding: 5px;
@@ -299,6 +279,7 @@ class MainWindow(QMainWindow):
                 QWidget#title_bar {
                     background-color: #ffabe0;
                 }
+
             """)
             self.theme_button.setText("Modo Oscuro")
         elif self.dark_mode:

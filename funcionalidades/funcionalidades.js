@@ -1,3 +1,11 @@
+function showSearchForm(formId) {
+    // Oculta todos los formularios de búsqueda
+    document.querySelectorAll('.search-form').forEach(form => form.style.display = 'none');
+    
+    // Muestra el formulario seleccionado
+    document.getElementById(formId).style.display = 'block';
+}
+
 document.getElementById('search-button').addEventListener('click', function() {
     var query = document.getElementById('search-input').value;
     if (query) {
