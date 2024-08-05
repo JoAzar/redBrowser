@@ -29,7 +29,10 @@ class MainWindow(QMainWindow):
         homepage_path = os.path.join(base_dir, 'homepage.html')
         config_icon_path = os.path.join(base_dir, 'icons', 'config.png')
         self.visible_icon_path = os.path.join(base_dir, 'icons', 'visible.png')
-        self.hidden_icon_path =os.path.join(base_dir, 'icons', 'hidden.png')
+        self.hidden_icon_path = os.path.join(base_dir, 'icons', 'hidden.png')
+        self.url_icon_path = os.path.join(base_dir, 'icons', 'redirect.png')
+        self.url_icon_path_home = os.path.join(base_dir, 'icons', 'home.png')
+
 
         # Configurar perfil del navegador en modo incógnito
         self.profile = IncognitoWebEngineProfile("IncognitoProfile")
@@ -63,8 +66,20 @@ class MainWindow(QMainWindow):
         self.theme_button = QPushButton("")
         self.theme_button.clicked.connect(self.toggle_theme)
 
-        self.refresh_button2 = QPushButton("")
+        # Botón de refrescar página en toolbar oculta
+        self.refresh_button_toolbar = QPushButton("")
+        self.refresh_button_toolbar.setIcon(QIcon(self.recharge_icon_path))
+        self.refresh_button_toolbar.clicked.connect(self.browser.reload)
 
+        # Botón de redirección url IA
+        self.redirect_button_toolbar = QPushButton("")
+        self.redirect_button_toolbar.setIcon(QIcon(self.url_icon_path))  # Usa el ícono que prefieras
+        self.redirect_button_toolbar.clicked.connect(self.redirect_to_page)
+
+        # Botón de redirección url HOMEPAGE
+        self.home_redirect_button_toolbar = QPushButton("")
+        self.home_redirect_button_toolbar.setIcon(QIcon(self.url_icon_path_home))  # Usa el ícono que prefieras
+        self.home_redirect_button_toolbar.clicked.connect(self.redirect_to_page_home)
 
         # Inicializar estado del color de tema
         self.dark_mode = False
@@ -75,8 +90,10 @@ class MainWindow(QMainWindow):
         self.main_tool_bar.setObjectName("MainToolBar")
 
         # Agregar el botón de cambio de tema a la barra de herramientas
-        self.main_tool_bar.addWidget(self.theme_button)  # Añadir el botón a la barra de herramientas
-        self.main_tool_bar.addWidget(self.refresh_button2)
+        self.main_tool_bar.addWidget(self.theme_button)                 #Añadir el botones a la barra de herramientas
+        self.main_tool_bar.addWidget(self.refresh_button_toolbar)
+        self.main_tool_bar.addWidget(self.redirect_button_toolbar)
+        self.main_tool_bar.addWidget(self.home_redirect_button_toolbar) 
 
         # La barra de herramientas inicia visible
         self.main_tool_bar.setVisible(True)
@@ -119,6 +136,14 @@ class MainWindow(QMainWindow):
 
         # Variables para arrastrar ventana
         self.drag_pos = None
+
+    def redirect_to_page(self): # Define la URL a la que quieres redirigir
+        new_url = "https://www.bing.com/images/create"
+        self.browser.setUrl(QUrl(new_url))
+
+    def redirect_to_page_home(self): # Define la URL a la que quieres redirigir
+        new_url = QUrl.fromLocalFile(os.path.join(os.path.dirname(__file__), 'homepage.html'))
+        self.browser.setUrl(new_url)
 
     def toggle_tool_bar(self):  # Alternar visibilidad de la barra de herramientas principal
         if self.main_tool_bar.isVisible():
