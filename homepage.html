@@ -6,7 +6,7 @@
         <title>Inicio</title>
         <style>
             body {
-                display: flex;
+                display: -ms-grid;
                 justify-content: center;
                 align-items: center;
                 height: 100vh;
@@ -14,19 +14,20 @@
                 font-family: Arial, sans-serif;
                 background-color: #f0f0f0;
             }
-            #search-form, #search-form2 {
+            #search-form, #search-form2, #search-form3 {
                 display: flex;
                 flex-direction: column;
-                align-items: center;
+                align-items: center
             }
-            #search-input, #search-input2 {
-                padding: 10px;
+            #search-input, #search-input2, #search-input3 {
+                margin-top: 150px;
+                padding: 15px;
                 font-size: 16px;
-                width: 300px;
+                width: 400px;
                 border: 1px solid #ccc;
                 border-radius: 5px;
             }
-            #search-button, #search-button2 {
+            #search-button, #search-button2, #search-button3{
                 margin-top: 10px;
                 padding: 10px 20px;
                 font-size: 16px;
@@ -36,7 +37,7 @@
                 color: white;
                 cursor: pointer;
             }
-            #search-button:hover, #search-button2:hover {
+            #search-button:hover, #search-button2:hover, #search-button3:hover {
                 background-color: #0056b3;
             }
         </style>
@@ -44,11 +45,15 @@
     <body style="background-image: url('icons/iconoBrowser.png'); background-color: rgb(27, 27, 27); background-repeat: no-repeat; background-size: cover; background-position: center;">
         <div id="search-form">
             <input type="text" id="search-input" placeholder="Buscar en DuckDuckGo...">
-            <button id="search-button">Buscar en Duck Duck</button>
+            <button id="search-button">Buscar en Duck Duck Go</button>
         </div>
         <div id="search-form2">
             <input type="text2" id="search-input2" placeholder="Buscar en Google...">
-            <button id="search-button2">Buscar Google</button>
+            <button id="search-button2">Buscar en Google</button>
+        </div>
+        <div id="search-form3">
+            <input type="text3" id="search-input3" placeholder="Buscar en Bing...">
+            <button id="search-button2">Buscar en Bing</button>
         </div>
         <script>
             document.getElementById('search-button').addEventListener('click', function() {
@@ -78,6 +83,22 @@
                     var query = document.getElementById('search-input2').value;
                     if (query) {
                         window.location.href = 'https://google.com/?q=' + encodeURIComponent(query);
+                    }
+                }
+            });
+            
+            document.getElementById('search-button3').addEventListener('click', function() {
+                var query = document.getElementById('search-input3').value;
+                if (query) {
+                    window.location.href = 'https://www.bing.com/?q=' + encodeURIComponent(query);
+                }
+            });
+
+            document.getElementById('search-input3').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    var query = document.getElementById('search-input3').value;
+                    if (query) {
+                        window.location.href = 'https://www.bing.com/?q=' + encodeURIComponent(query);
                     }
                 }
             });
