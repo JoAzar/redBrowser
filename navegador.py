@@ -63,8 +63,10 @@ class MainWindow(QMainWindow):
         self.theme_button = QPushButton("")
         self.theme_button.clicked.connect(self.toggle_theme)
 
-        self.refresh_button2 = QPushButton("")
-
+        # Botón de refrescar página en toolbar oculta
+        self.refresh_button_toolbar = QPushButton("")
+        self.refresh_button_toolbar.setIcon(QIcon(self.recharge_icon_path))
+        self.refresh_button_toolbar.clicked.connect(self.browser.reload)
 
         # Inicializar estado del color de tema
         self.dark_mode = False
@@ -76,7 +78,7 @@ class MainWindow(QMainWindow):
 
         # Agregar el botón de cambio de tema a la barra de herramientas
         self.main_tool_bar.addWidget(self.theme_button)  # Añadir el botón a la barra de herramientas
-        self.main_tool_bar.addWidget(self.refresh_button2)
+        self.main_tool_bar.addWidget(self.refresh_button_toolbar)
 
         # La barra de herramientas inicia visible
         self.main_tool_bar.setVisible(True)
