@@ -24,7 +24,8 @@ document.getElementById('search-input').addEventListener('keypress', function(e)
 document.getElementById('search-button2').addEventListener('click', function() {
     var query = document.getElementById('search-input2').value;
     if (query) {
-        window.location.href = 'https://google.com/?q=' + encodeURIComponent(query);
+        window.location.href = 'https://google.com/search?q=' + encodeURIComponent(query);
+
     }
 });
 
@@ -32,7 +33,7 @@ document.getElementById('search-input2').addEventListener('keypress', function(e
     if (e.key === 'Enter') {
         var query = document.getElementById('search-input2').value;
         if (query) {
-            window.location.href = 'https://google.com/?q=' + encodeURIComponent(query);
+            window.location.href = 'https://google.com/search?q=' + encodeURIComponent(query);
         }
     }
 });
