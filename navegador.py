@@ -20,19 +20,40 @@ class MainWindow(QMainWindow):
         # PATHS
         base_dir = os.path.dirname(__file__)
         self.back_icon_path = os.path.join(base_dir, 'icons', 'back.png')
+        self.back_n_icon_path = os.path.join(base_dir, 'icons', 'back_n.png')
+
         self.forward_icon_path = os.path.join(base_dir, 'icons', 'forward.png')
+        self.forward_n_icon_path = os.path.join(base_dir, 'icons', 'forward_n.png')
+
         self.browser_icon_path = os.path.join(base_dir, 'icons', 'iconoBrowser.ico')
+
         self.recharge_icon_path = os.path.join(base_dir, 'icons', 'recharge.png')
+        self.recharge_n_icon_path = os.path.join(base_dir, 'icons', 'recharge_n.png')
+
         homepage_path = os.path.join(base_dir, 'homepage.html')
-        #error_404_path = os.path.join(base_dir, 'notFound.html') #aun no implementado
+        homepage_n_path = os.path.join(base_dir, 'homepage_n.html')
+
         config_icon_path = os.path.join(base_dir, 'icons', 'config.png')
+        config_n_icon_path = os.path.join(base_dir, 'icons', 'config_n.png')
+
         self.visible_icon_path = os.path.join(base_dir, 'icons', 'visible.png')
+        self.visible_n_icon_path = os.path.join(base_dir, 'icons', 'visible_n.png')
+
         self.hidden_icon_path = os.path.join(base_dir, 'icons', 'hidden.png')
+        self.hidden_n_icon_path = os.path.join(base_dir, 'icons', 'hidden_n.png')
+
         self.url_icon_path = os.path.join(base_dir, 'icons', 'redirect.png')
+        self.url_n_icon_path = os.path.join(base_dir, 'icons', 'redirect_n.png')
+
         self.url_icon_path_home = os.path.join(base_dir, 'icons', 'home.png')
+        self.url_n_icon_path_home = os.path.join(base_dir, 'icons', 'home_n.png')
+
         self.modo_claro_icon_path = os.path.join(base_dir, 'icons', 'claro.png')
         self.modo_oscuro_icon_path = os.path.join(base_dir, 'icons', 'oscuro.png')
         self.modo_pink_icon_path = os.path.join(base_dir, 'icons', 'pink.png')
+
+        self.instagram_n_icon_path = os.path.join(base_dir, 'icons', 'instagram_n.png')
+        self.instagram_c_icon_path = os.path.join(base_dir, 'icons', 'instagram_c.png')
 
         # Configurar perfil del navegador en modo incógnito
         self.profile = IncognitoWebEngineProfile("IncognitoProfile")
@@ -74,8 +95,12 @@ class MainWindow(QMainWindow):
         # Botón de refrescar página en toolbar oculta
         self.refresh_button_toolbar = QPushButton("")
         self.refresh_button_toolbar.setToolTip("Refrescar")
-        self.refresh_button_toolbar.setIcon(QIcon(self.recharge_icon_path))
+        self.refresh_button_toolbar.setIcon(QIcon(self.recharge_n_icon_path))
         self.refresh_button_toolbar.clicked.connect(self.browser.reload)
+
+        #llamado a la funcion para rotar iconos
+        self.refresh_button_toolbar.installEventFilter(self)
+        
 
         # Botón de redirección url IA
         self.redirect_button_toolbar = QPushButton("")
@@ -88,6 +113,15 @@ class MainWindow(QMainWindow):
         self.home_redirect_button_toolbar.setToolTip("Volver al Inicio")
         self.home_redirect_button_toolbar.setIcon(QIcon(self.url_icon_path_home))
         self.home_redirect_button_toolbar.clicked.connect(self.redirect_to_page_home)
+
+        #Botón de redirección a Instagram Color
+        self.instagram_redirect_button_toolbar = QPushButton("")
+        self.instagram_redirect_button_toolbar.setToolTip("Ir a Instagram")
+        self.instagram_redirect_button_toolbar.setIcon(QIcon(self.instagram_c_icon_path))
+        self.instagram_redirect_button_toolbar.clicked.connect(self.redirect_to_insta)
+
+        #llamado a la funcion para rotar iconos
+        self.instagram_redirect_button_toolbar.installEventFilter(self)
 
         # Inicializar estado del color de tema
         self.dark_mode = False
@@ -102,8 +136,9 @@ class MainWindow(QMainWindow):
         self.main_tool_bar.addWidget(self.theme_button)                     #Añadir el botones a la barra de herramientas
         self.main_tool_bar.addWidget(self.refresh_button_toolbar)
         self.main_tool_bar.addWidget(self.redirect_button_toolbar)
-        self.main_tool_bar.addWidget(self.home_redirect_button_toolbar) 
-
+        self.main_tool_bar.addWidget(self.home_redirect_button_toolbar)
+        self.main_tool_bar.addWidget(self.instagram_redirect_button_toolbar)
+        
         # La barra de herramientas inicia visible
         self.main_tool_bar.setVisible(True)
 
@@ -159,16 +194,26 @@ class MainWindow(QMainWindow):
         # Variables para arrastrar ventana
         self.drag_pos = None
 
+    def eventFilter(self, obj, event):
+        if event.type() == QEvent.Type.Enter:
+            if obj == self.instagram_redirect_button_toolbar:
+                self.instagram_redirect_button_toolbar.setIcon(QIcon(self.instagram_c_icon_path))
+            elif obj == self.refresh_button_toolbar:
+                self.refresh_button_toolbar.setIcon(QIcon(self.recharge_icon_path))
+        elif event.type() == QEvent.Type.Leave:
+            if obj == self.instagram_redirect_button_toolbar:
+                self.instagram_redirect_button_toolbar.setIcon(QIcon(self.instagram_n_icon_path))
+            elif obj == self.refresh_button_toolbar:
+                self.refresh_button_toolbar.setIcon(QIcon(self.recharge_n_icon_path))
+        return super().eventFilter(obj, event)
+
     def redirect_to_page(self): # Define la URL a la que quieres redirigir
         new_url = "https://www.bing.com/images/create"
         self.browser.setUrl(QUrl(new_url))
 
-    def handle_load_finished(self, ok):
-        if not ok:
-            print("Error al cargar la página")
-            self.redirect_to_page_404()
-        else:
-            print("Página cargada correctamente")
+    def redirect_to_insta(self): # Define la URL a la que quieres redirigir
+        new_url = "https://www.instagram.com"
+        self.browser.setUrl(QUrl(new_url))
 
     def redirect_to_page_home(self): # Define la URL a la que quieres redirigir
         new_url = QUrl.fromLocalFile(os.path.join(os.path.dirname(__file__), 'homepage.html'))
