@@ -1,4 +1,37 @@
+/** import de fonts css */
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
+
+
 body {
+    overflow: hidden;
+    background-image: url('../icons/iconoBrowser.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: "Lato", sans-serif;
+    background-color: #181818;
+    padding: 5px;
+    filter: brightness(70%) blur(2px);
+}
+
+.google {
+    color: white;
+    font-family: "Lato", sans-serif;
+}
+
+body:hover{
+    filter: none;
+    overflow: hidden;
+    background-image: url('../icons/iconoBrowser.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
     overflow: hidden;
     display: flex;
     justify-content: center;
@@ -6,17 +39,26 @@ body {
     height: 100vh;
     margin: 0;
     font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
+    background-color: #181818;
+    padding: 5px;
 }
+
 #search-buttons {
-    display: flex-start;
+    display: flex;
     justify-content: center;
 }
+
+#search-buttons:hover {
+    display: flex;
+    justify-content: center;
+}
+
 #search-form, #search-form2, #search-form3 {
     display: flex;
     flex-direction: column;
-    align-items: center
+    align-items: center;
 }
+
 #search-input, #search-input2, #search-input3 {
     padding: 15px;
     font-size: 16px;
@@ -24,6 +66,7 @@ body {
     border: 1px solid #ccc;
     border-radius: 5px;
 }
+
 #search-buttons button{
     margin: 10px;
     padding: 10px 20px;
@@ -34,7 +77,8 @@ body {
     color: white;
     cursor: pointer;
 }
-#search-button, #search-button2, #search-button3{
+
+#search-button, #search-button2, #search-button3, #search-buttons1, #search-buttons2, #search-buttons3{
     padding: 10px 20px;
     font-size: 16px;
     border: none;
@@ -42,12 +86,55 @@ body {
     background-color: #007bff;
     color: white;
     cursor: pointer;
+    transition: all 0.3s ease-in-out;
 }
-#search-button:hover, #search-button2:hover, #search-button3:hover {
+
+#search-button:hover, #search-button2:hover, #search-button3:hover, #search-buttons1:hover, #search-buttons2:hover, #search-buttons3:hover {
     background-color: #0056b3;
+    transform: scale(1.1);
 }
 
 .search-form {
     display: none; /* Oculta todas las barras de búsqueda inicialmente */
 }
 
+/* CUANDO LA VENTANA ES PEQUEÑA CAMBIA LA FORMA */
+@media (max-width: 1020px) {
+    body {
+        overflow: hidden;
+        background-image: url('../icons/iconoBrowser.png');
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: center;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-color: #181818;
+        padding: 5px;
+        filter: brightness(70%) blur(2px);
+    }
+    body:hover{
+        filter: none;
+        overflow: hidden;
+        background-image: url('../icons/iconoBrowser.png');
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: center;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-color: #181818;
+        padding: 5px;
+        filter: drop-shadow(0 0 10px rgb(255, 255, 255));
+    }
+  
+}
+  

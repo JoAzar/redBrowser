@@ -6,12 +6,13 @@ from PyQt6.QtWebEngineCore import*
 import os
 import sys
 
+
 # Perfil de navegador en modo incógnito.
 class IncognitoWebEngineProfile(QWebEngineProfile):
     def __init__(self, name, parent=None):
         super().__init__(name, parent)
         self.setPersistentCookiesPolicy(QWebEngineProfile.PersistentCookiesPolicy.NoPersistentCookies)
-        self.setPersistentStoragePath("") 
+        self.setPersistentStoragePath("")
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -30,8 +31,7 @@ class MainWindow(QMainWindow):
         self.recharge_icon_path = os.path.join(base_dir, 'icons', 'recharge.png')
         self.recharge_n_icon_path = os.path.join(base_dir, 'icons', 'recharge_n.png')
 
-        homepage_path = os.path.join(base_dir, 'homepage.html')
-        homepage_n_path = os.path.join(base_dir, 'homepage_n.html')
+        homepage_path = os.path.join(base_dir, 'public/homepage.html')
 
         config_icon_path = os.path.join(base_dir, 'icons', 'config.png')
         config_n_icon_path = os.path.join(base_dir, 'icons', 'config_n.png')
@@ -55,6 +55,9 @@ class MainWindow(QMainWindow):
         self.instagram_n_icon_path = os.path.join(base_dir, 'icons', 'instagram_n.png')
         self.instagram_c_icon_path = os.path.join(base_dir, 'icons', 'instagram_c.png')
 
+        self.map_n_icon_path = os.path.join(base_dir, 'icons', 'map_n.png')     #FALTAN LOS BOTONES
+        self.map_c_icon_path = os.path.join(base_dir, 'icons', 'map_c.png')
+
         # Configurar perfil del navegador en modo incógnito
         self.profile = IncognitoWebEngineProfile("IncognitoProfile")
 
@@ -63,7 +66,7 @@ class MainWindow(QMainWindow):
         self.browser.setUrl(QUrl.fromLocalFile(homepage_path))
 
         self.url_bar = QLineEdit()
-        self.url_bar.returnPressed.connect(self.navigate_to_url)
+        #self.url_bar.returnPressed.connect(self.navigate_to_url)
         self.browser.urlChanged.connect(self.update_url_bar)
 
         self.back_button = QPushButton()
@@ -100,13 +103,18 @@ class MainWindow(QMainWindow):
 
         #llamado a la funcion para rotar iconos
         self.refresh_button_toolbar.installEventFilter(self)
-        
 
         # Botón de redirección url IA
         self.redirect_button_toolbar = QPushButton("")
         self.redirect_button_toolbar.setToolTip("Crear imágen con IA")
         self.redirect_button_toolbar.setIcon(QIcon(self.url_icon_path))
         self.redirect_button_toolbar.clicked.connect(self.redirect_to_page)
+
+        # Botón de redirección url MAPS
+        self.maps_redirect_button_toolbar = QPushButton("")
+        self.maps_redirect_button_toolbar.setToolTip("Ver Mapas")
+        self.maps_redirect_button_toolbar.setIcon(QIcon(self.map_n_icon_path))
+        self.maps_redirect_button_toolbar.clicked.connect(self.redirect_to_maps)
 
         # Botón de redirección url HOMEPAGE
         self.home_redirect_button_toolbar = QPushButton("")
@@ -138,6 +146,7 @@ class MainWindow(QMainWindow):
         self.main_tool_bar.addWidget(self.redirect_button_toolbar)
         self.main_tool_bar.addWidget(self.home_redirect_button_toolbar)
         self.main_tool_bar.addWidget(self.instagram_redirect_button_toolbar)
+        self.main_tool_bar.addWidget(self.maps_redirect_button_toolbar)
         
         # La barra de herramientas inicia visible
         self.main_tool_bar.setVisible(True)
@@ -189,10 +198,6 @@ class MainWindow(QMainWindow):
         # Configurar opciones de privacidad
         self.configure_privacy_settings()
 
-        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
-
-        # Variables para arrastrar ventana
-        self.drag_pos = None
 
     def eventFilter(self, obj, event):
         if event.type() == QEvent.Type.Enter:
@@ -200,23 +205,34 @@ class MainWindow(QMainWindow):
                 self.instagram_redirect_button_toolbar.setIcon(QIcon(self.instagram_c_icon_path))
             elif obj == self.refresh_button_toolbar:
                 self.refresh_button_toolbar.setIcon(QIcon(self.recharge_icon_path))
+            elif obj == self.maps_redirect_button_toolbar:
+                self.maps_redirect_button_toolbar.setIcon(QIcon(self.map_c_icon_path))
+
         elif event.type() == QEvent.Type.Leave:
             if obj == self.instagram_redirect_button_toolbar:
                 self.instagram_redirect_button_toolbar.setIcon(QIcon(self.instagram_n_icon_path))
             elif obj == self.refresh_button_toolbar:
                 self.refresh_button_toolbar.setIcon(QIcon(self.recharge_n_icon_path))
-        return super().eventFilter(obj, event)
+            elif obj == self.maps_redirect_button_toolbar:
+                self.maps_redirect_button_toolbar.setIcon(QIcon(self.map_n_icon_path))
 
-    def redirect_to_page(self): # Define la URL a la que quieres redirigir
+        return super().eventFilter(obj, event)
+    
+    
+    def redirect_to_maps(self):
+        new_url = QUrl.fromLocalFile(os.path.join(os.path.dirname(__file__), 'public/map.html'))
+        self.browser.setUrl(new_url)
+
+    def redirect_to_page(self):
         new_url = "https://www.bing.com/images/create"
         self.browser.setUrl(QUrl(new_url))
 
-    def redirect_to_insta(self): # Define la URL a la que quieres redirigir
+    def redirect_to_insta(self):
         new_url = "https://www.instagram.com"
         self.browser.setUrl(QUrl(new_url))
 
-    def redirect_to_page_home(self): # Define la URL a la que quieres redirigir
-        new_url = QUrl.fromLocalFile(os.path.join(os.path.dirname(__file__), 'homepage.html'))
+    def redirect_to_page_home(self):
+        new_url = QUrl.fromLocalFile(os.path.join(os.path.dirname(__file__), 'public/homepage.html'))
         self.browser.setUrl(new_url)
 
     def toggle_tool_bar(self):  # Alternar visibilidad de la barra de herramientas principal
@@ -240,10 +256,7 @@ class MainWindow(QMainWindow):
         # Agrega un espaciador para alinear los botones a la derecha
         self.spacer = QSpacerItem(20, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
         self.title_layout.addItem(self.spacer)
-        
-        # Agregar eventos de arrastre
-        self.title_bar.mousePressEvent = self.mousePressEvent
-        self.title_bar.mouseMoveEvent = self.mouseMoveEvent
+
 
     # Maneja el evento de presionar el ratón para iniciar el arrastre
     def mousePressEvent(self, event: QMouseEvent):
@@ -271,7 +284,6 @@ class MainWindow(QMainWindow):
         settings.setAttribute(QWebEngineSettings.WebAttribute.DnsPrefetchEnabled, True)
         settings.setAttribute(QWebEngineSettings.WebAttribute.PdfViewerEnabled, True)
         
-
     def navigate_to_url(self):
         url = self.url_bar.text()
         if not url.startswith('http'):

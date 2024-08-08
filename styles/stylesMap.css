@@ -1,0 +1,60 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
+
+
+html, body {
+    height: 100%;
+    margin: 0;
+    font-family: "Lato", sans-serif;
+    background-color: #181818;
+}
+
+body {
+    background-repeat: no-repeat;
+    background-image: url('../icons/red.jpg');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+/* Contenedor para los iframes y el título */
+.container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    box-sizing: border-box;
+    align-items: center; 
+}
+
+.container > div {
+    flex: 1; /* Permite que los elementos se expandan para llenar el espacio disponible */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+
+
+/* Ajusta el estilo del título */
+h1 {
+    color: white;
+    text-align: center;
+    margin: 20px 0;
+    font-family: "Lato", sans-serif;
+}
+
+.mapa1, .mapa2 {
+    margin: 3vh;
+    padding: 3vh;
+    display: flex;
+    flex-direction: column;
+}
