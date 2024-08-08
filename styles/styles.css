@@ -20,9 +20,11 @@ body {
     filter: brightness(70%) blur(2px);
 }
 
-.google {
+footer {
     color: white;
     font-family: "Lato", sans-serif;
+    margin: 5vh;
+    padding: 5vh;
 }
 
 body:hover{

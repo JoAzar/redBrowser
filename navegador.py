@@ -15,14 +15,14 @@ class IncognitoWebEngineProfile(QWebEngineProfile):
         self.setPersistentStoragePath("")
 
 class MainWindow2(QMainWindow):
-    def __init__(self):
+    def __init__(self, style_sheet):
         super().__init__()
 
         # Crear el widget central y el diseño
         layout = QVBoxLayout()
         central_widget = QWidget()
         self.setWindowTitle("CONFIGURACIONES")
-        self.resize(300, 100)
+        self.resize(100, 50)
         # Crear el QCheckBox
         self.checkbox1 = QCheckBox()
         self.checkbox1.setText("Cambiar Color")
@@ -76,14 +76,8 @@ class MainWindow2(QMainWindow):
         self.checkbox5.stateChanged.connect(self.show_state)
         self.checkbox6.stateChanged.connect(self.show_state)
 
-        # Aplicar un estilo CSS para bordes redondeados
-        self.setStyleSheet("""
-            QMainWindow {
-                border-radius: 15px;
-                border: 2px solid #000;  /* Color y grosor del borde */
-                padding: 5px;
-            }
-        """)
+        # Aplicar el estilo CSS a la ventana secundaria
+        self.setStyleSheet(style_sheet)
 
     #FUNCIONES DE MAIN 2    
     def show_state(self, state):
@@ -92,6 +86,7 @@ class MainWindow2(QMainWindow):
                 print(f"{checkbox.text()}: Marcado")
             else:
                 print(f"{checkbox.text()}: No marcado")
+
 
 
 class MainWindow(QMainWindow):
@@ -312,9 +307,26 @@ class MainWindow(QMainWindow):
 
     def abrirVentanaConfig(self):
         if self.secondary_window is None or not self.secondary_window.isVisible():
-            self.secondary_window = MainWindow2()
+            style_sheet = self.apply_styles()
+            self.secondary_window = MainWindow2(style_sheet)
+            main_window_pos = self.pos()
+            secondary_window_pos = QPoint(main_window_pos.x() + 50, main_window_pos.y()+100)
+            self.secondary_window.move(secondary_window_pos)
             self.secondary_window.show()
         else:
+            self.secondary_window.close()
+            self.secondary_window = None
+
+    def moveEvent(self, event):
+        super().moveEvent(event)
+        self.check_secondary_window_visibility()
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self.check_secondary_window_visibility()
+
+    def check_secondary_window_visibility(self):
+        if self.secondary_window and self.secondary_window.isVisible():
             self.secondary_window.close()
             self.secondary_window = None
 
@@ -386,10 +398,11 @@ class MainWindow(QMainWindow):
     def update_url_bar(self, q):
         self.url_bar.setText(q.toString())
 
-    # Aplica estilos personalizados a los widgets.  -> #NOTA QPushButton son los botones de maxi min y cerrar
+    # Aplica estilos personalizados
     def apply_styles(self):
+        style_sheet = ""
         if self.pink_mode:
-            self.setStyleSheet("""
+            style_sheet = """
                 QMainWindow {
                     background-color: #ff61c5;
                 }
@@ -430,11 +443,10 @@ class MainWindow(QMainWindow):
                 QWidget#title_bar {
                     background-color: #ffabe0;
                 }
-
-            """)
+            """
             self.theme_button.setIcon(QIcon(self.modo_oscuro_icon_path))
         elif self.dark_mode:
-            self.setStyleSheet("""
+            style_sheet = """
                 QMainWindow {
                     background-color: #131313;
                 }
@@ -444,11 +456,6 @@ class MainWindow(QMainWindow):
                     border: 1px solid black;
                     padding: 5px;
                     border-radius: 30px;
-                }
-                QToolTip {
-                    background-color: white;
-                    color: black;
-                    border: 1px solid black;
                 }
                 QWidget {
                     background-color: #131313;
@@ -464,11 +471,11 @@ class MainWindow(QMainWindow):
                     min-height: 10px;
                 }
                 QPushButton:hover {
-                    background-color:   #ffffff;
+                    background-color: #ffffff;
                     color: black;
                 }
                 QPushButton:pressed {
-                    background-color:   #ffffff;
+                    background-color: #ffffff;
                 }
                 QLineEdit {
                     padding: 5px;
@@ -480,10 +487,10 @@ class MainWindow(QMainWindow):
                 QWidget#title_bar {
                     background-color: #131313;
                 }
-            """)
+            """
             self.theme_button.setIcon(QIcon(self.modo_claro_icon_path))
         else:
-            self.setStyleSheet("""
+            style_sheet = """
                 QMainWindow {
                     background-color: #000;
                 }
@@ -506,8 +513,8 @@ class MainWindow(QMainWindow):
                     min-height: 10px;
                 }
                 QPushButton:hover {
-                    background-color:  #686868;
-                    color:  #ffffff;
+                    background-color: #686868;
+                    color: #ffffff;
                 }
                 QLineEdit {
                     padding: 5px;
@@ -519,8 +526,11 @@ class MainWindow(QMainWindow):
                 QWidget#title_bar {
                     background-color: #fff;
                 }
-            """)
+            """
             self.theme_button.setIcon(QIcon(self.modo_pink_icon_path))
+
+        self.setStyleSheet(style_sheet)
+        return style_sheet
 
     # Cambia entre modo claro y oscuro.
     def toggle_theme(self):
