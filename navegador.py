@@ -14,6 +14,86 @@ class IncognitoWebEngineProfile(QWebEngineProfile):
         self.setPersistentCookiesPolicy(QWebEngineProfile.PersistentCookiesPolicy.NoPersistentCookies)
         self.setPersistentStoragePath("")
 
+class MainWindow2(QMainWindow):
+    def __init__(self):
+        super().__init__()
+
+        # Crear el widget central y el diseño
+        layout = QVBoxLayout()
+        central_widget = QWidget()
+        self.setWindowTitle("CONFIGURACIONES")
+        self.resize(300, 100)
+        # Crear el QCheckBox
+        self.checkbox1 = QCheckBox()
+        self.checkbox1.setText("Cambiar Color")
+        self.checkbox1.setCheckState(Qt.CheckState.Unchecked)
+
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint)  # Quitar el marco y la barra de título
+        #self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)  # Hacer que el fondo sea transparente
+
+        # Crear el QCheckBox
+        self.checkbox2 = QCheckBox()
+        self.checkbox2.setText("Crear Imagen IA")
+        self.checkbox2.setCheckState(Qt.CheckState.Unchecked)
+
+        # Crear el QCheckBox
+        self.checkbox3 = QCheckBox()
+        self.checkbox3.setText("Instagram")
+        self.checkbox3.setCheckState(Qt.CheckState.Unchecked)
+
+        # Crear el QCheckBox
+        self.checkbox4 = QCheckBox()
+        self.checkbox4.setText("Otra Opcion 1")
+        self.checkbox4.setCheckState(Qt.CheckState.Unchecked)
+
+        # Crear el QCheckBox
+        self.checkbox5 = QCheckBox()
+        self.checkbox5.setText("Otra Opcion 2")
+        self.checkbox5.setCheckState(Qt.CheckState.Unchecked)
+
+        # Crear el QCheckBox
+        self.checkbox6 = QCheckBox()
+        self.checkbox6.setText("Otra Opcion 3")
+        self.checkbox6.setCheckState(Qt.CheckState.Unchecked)
+        
+        # Añadir el QCheckBox al diseño
+        layout.addWidget(self.checkbox1, alignment=Qt.AlignmentFlag.AlignVCenter)
+        layout.addWidget(self.checkbox2, alignment=Qt.AlignmentFlag.AlignVCenter)
+        layout.addWidget(self.checkbox3, alignment=Qt.AlignmentFlag.AlignVCenter)
+        layout.addWidget(self.checkbox4, alignment=Qt.AlignmentFlag.AlignVCenter)
+        layout.addWidget(self.checkbox5, alignment=Qt.AlignmentFlag.AlignVCenter)
+        layout.addWidget(self.checkbox6, alignment=Qt.AlignmentFlag.AlignVCenter)
+        
+        # Establecer el diseño en el widget central
+        central_widget.setLayout(layout)
+        self.setCentralWidget(central_widget)
+
+        # Conectar la señal stateChanged a show_state
+        self.checkbox1.stateChanged.connect(self.show_state)
+        self.checkbox2.stateChanged.connect(self.show_state)
+        self.checkbox3.stateChanged.connect(self.show_state)
+        self.checkbox4.stateChanged.connect(self.show_state)
+        self.checkbox5.stateChanged.connect(self.show_state)
+        self.checkbox6.stateChanged.connect(self.show_state)
+
+        # Aplicar un estilo CSS para bordes redondeados
+        self.setStyleSheet("""
+            QMainWindow {
+                border-radius: 15px;
+                border: 2px solid #000;  /* Color y grosor del borde */
+                padding: 5px;
+            }
+        """)
+
+    #FUNCIONES DE MAIN 2    
+    def show_state(self, state):
+        for checkbox in [self.checkbox1, self.checkbox2, self.checkbox3, self.checkbox4, self.checkbox5, self.checkbox6]:
+            if checkbox.checkState() == Qt.CheckState.Checked:
+                print(f"{checkbox.text()}: Marcado")
+            else:
+                print(f"{checkbox.text()}: No marcado")
+
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -58,6 +138,9 @@ class MainWindow(QMainWindow):
         self.map_n_icon_path = os.path.join(base_dir, 'icons', 'map_n.png')     #FALTAN LOS BOTONES
         self.map_c_icon_path = os.path.join(base_dir, 'icons', 'map_c.png')
 
+        self.config_icon_path = os.path.join(base_dir, 'icons', 'configuracion.png')
+        
+
         # Configurar perfil del navegador en modo incógnito
         self.profile = IncognitoWebEngineProfile("IncognitoProfile")
 
@@ -68,6 +151,9 @@ class MainWindow(QMainWindow):
         self.url_bar = QLineEdit()
         #self.url_bar.returnPressed.connect(self.navigate_to_url)
         self.browser.urlChanged.connect(self.update_url_bar)
+
+        #inicio la ventana del config
+        self.secondary_window = None
 
         self.back_button = QPushButton()
         self.back_button.setIcon(QIcon(self.back_icon_path))
@@ -84,10 +170,15 @@ class MainWindow(QMainWindow):
         self.refresh_button.setToolTip("Refrescar")
         self.refresh_button.clicked.connect(self.browser.reload)
 
+        self.config_button = QPushButton()
+        self.config_button.setIcon(QIcon(self.config_icon_path))
+        self.config_button.setToolTip("Configuración")
+        self.config_button.clicked.connect(self.abrirVentanaConfig)
+
         # Botón para mostrar/ocultar la barra de herramientas
         self.toggle_toolbar_button = QPushButton()
         self.toggle_toolbar_button.setIcon(QIcon(config_icon_path))
-        self.toggle_toolbar_button.setToolTip("Configuraciones")
+        self.toggle_toolbar_button.setToolTip("Herramientas")
         self.toggle_toolbar_button.clicked.connect(self.toggle_tool_bar)
 
         # Botón de cambio de tema
@@ -167,6 +258,7 @@ class MainWindow(QMainWindow):
         self.url_layout.addWidget(self.back_button)
         self.url_layout.addWidget(self.forward_button)
         self.url_layout.addWidget(self.refresh_button)
+        self.url_layout.addWidget(self.config_button)
         self.url_layout.addWidget(self.url_bar)
         self.url_layout.addWidget(self.toggle_toolbar_button)
 
@@ -215,10 +307,17 @@ class MainWindow(QMainWindow):
                 self.refresh_button_toolbar.setIcon(QIcon(self.recharge_n_icon_path))
             elif obj == self.maps_redirect_button_toolbar:
                 self.maps_redirect_button_toolbar.setIcon(QIcon(self.map_n_icon_path))
-
         return super().eventFilter(obj, event)
-    
-    
+
+
+    def abrirVentanaConfig(self):
+        if self.secondary_window is None or not self.secondary_window.isVisible():
+            self.secondary_window = MainWindow2()
+            self.secondary_window.show()
+        else:
+            self.secondary_window.close()
+            self.secondary_window = None
+
     def redirect_to_maps(self):
         new_url = QUrl.fromLocalFile(os.path.join(os.path.dirname(__file__), 'public/map.html'))
         self.browser.setUrl(new_url)
@@ -256,13 +355,6 @@ class MainWindow(QMainWindow):
         # Agrega un espaciador para alinear los botones a la derecha
         self.spacer = QSpacerItem(20, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
         self.title_layout.addItem(self.spacer)
-
-
-    # Maneja el evento de presionar el ratón para iniciar el arrastre
-    def mousePressEvent(self, event: QMouseEvent):
-        if event.button() == Qt.MouseButton.LeftButton:
-            self.drag_pos = event.globalPosition().toPoint() - self.frameGeometry().topLeft()
-            event.accept()
 
     def configure_privacy_settings(self):
         settings = self.browser.settings()
