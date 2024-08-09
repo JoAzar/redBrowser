@@ -15,8 +15,11 @@ class IncognitoWebEngineProfile(QWebEngineProfile):
         self.setPersistentStoragePath("")
 
 class MainWindow2(QMainWindow):
-    def __init__(self, style_sheet):
+    def __init__(self, style_sheet, main_window):
         super().__init__()
+
+        # Guarda una referencia a la ventana principal
+        self.main_window = main_window
 
         # Crear el widget central y el diseño
         layout = QVBoxLayout()
@@ -25,7 +28,7 @@ class MainWindow2(QMainWindow):
         self.resize(100, 50)
         # Crear el QCheckBox
         self.checkbox1 = QCheckBox()
-        self.checkbox1.setText("Cambiar Color")
+        self.checkbox1.setText("Configuration")
         self.checkbox1.setCheckState(Qt.CheckState.Unchecked)
 
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint)  # Quitar el marco y la barra de título
@@ -79,13 +82,16 @@ class MainWindow2(QMainWindow):
         # Aplicar el estilo CSS a la ventana secundaria
         self.setStyleSheet(style_sheet)
 
-    #FUNCIONES DE MAIN 2    
     def show_state(self, state):
-        for checkbox in [self.checkbox1, self.checkbox2, self.checkbox3, self.checkbox4, self.checkbox5, self.checkbox6]:
-            if checkbox.checkState() == Qt.CheckState.Checked:
-                print(f"{checkbox.text()}: Marcado")
-            else:
-                print(f"{checkbox.text()}: No marcado")
+        checkbox_states = {
+            "Configuration": self.checkbox1.isChecked(),
+            "Crear Imagen IA": self.checkbox2.isChecked(),
+            "Instagram": self.checkbox3.isChecked(),
+            "Otra Opcion 1": self.checkbox4.isChecked(),
+            "Otra Opcion 2": self.checkbox5.isChecked(),
+            "Otra Opcion 3": self.checkbox6.isChecked()
+        }
+        self.main_window.update_buttons_state(checkbox_states)
 
 
 
@@ -108,14 +114,10 @@ class MainWindow(QMainWindow):
 
         homepage_path = os.path.join(base_dir, 'public/homepage.html')
 
-        config_icon_path = os.path.join(base_dir, 'icons', 'config.png')
-        config_n_icon_path = os.path.join(base_dir, 'icons', 'config_n.png')
+        self.config_icon_path = os.path.join(base_dir, 'icons', 'config.png')
 
-        self.visible_icon_path = os.path.join(base_dir, 'icons', 'visible.png')
-        self.visible_n_icon_path = os.path.join(base_dir, 'icons', 'visible_n.png')
-
-        self.hidden_icon_path = os.path.join(base_dir, 'icons', 'hidden.png')
-        self.hidden_n_icon_path = os.path.join(base_dir, 'icons', 'hidden_n.png')
+        self.visible_icon_path = os.path.join(base_dir, 'icons', 'config.png')
+        self.hidden_icon_path = os.path.join(base_dir, 'icons', 'config_n.png')
 
         self.url_icon_path = os.path.join(base_dir, 'icons', 'redirect.png')
         self.url_n_icon_path = os.path.join(base_dir, 'icons', 'redirect_n.png')
@@ -133,7 +135,8 @@ class MainWindow(QMainWindow):
         self.map_n_icon_path = os.path.join(base_dir, 'icons', 'map_n.png')     #FALTAN LOS BOTONES
         self.map_c_icon_path = os.path.join(base_dir, 'icons', 'map_c.png')
 
-        self.config_icon_path = os.path.join(base_dir, 'icons', 'configuracion.png')
+        self.tools_icon_path = os.path.join(base_dir, 'icons', 'configuracion.png')
+        self.tools_n_icon_path = os.path.join(base_dir, 'icons', 'configuracion_n.png')
         
 
         # Configurar perfil del navegador en modo incógnito
@@ -165,16 +168,19 @@ class MainWindow(QMainWindow):
         self.refresh_button.setToolTip("Refrescar")
         self.refresh_button.clicked.connect(self.browser.reload)
 
-        self.config_button = QPushButton()
-        self.config_button.setIcon(QIcon(self.config_icon_path))
-        self.config_button.setToolTip("Configuración")
-        self.config_button.clicked.connect(self.abrirVentanaConfig)
+        #tools de navegador
+        self.tools_button = QPushButton()
+        self.tools_button.setIcon(QIcon(self.tools_icon_path))
+        self.tools_button.setToolTip("Tools")
+        self.tools_button.clicked.connect(self.abrirVentanaConfig)
+        self.tools_button.installEventFilter(self)
 
         # Botón para mostrar/ocultar la barra de herramientas
         self.toggle_toolbar_button = QPushButton()
-        self.toggle_toolbar_button.setIcon(QIcon(config_icon_path))
+        self.toggle_toolbar_button.setIcon(QIcon(self.config_icon_path))
         self.toggle_toolbar_button.setToolTip("Herramientas")
         self.toggle_toolbar_button.clicked.connect(self.toggle_tool_bar)
+        self.toggle_toolbar_button.installEventFilter(self)
 
         # Botón de cambio de tema
         self.theme_button = QPushButton("")
@@ -183,13 +189,11 @@ class MainWindow(QMainWindow):
 
         # Botón de refrescar página en toolbar oculta
         self.refresh_button_toolbar = QPushButton("")
-        self.refresh_button_toolbar.setToolTip("Refrescar")
         self.refresh_button_toolbar.setIcon(QIcon(self.recharge_n_icon_path))
+        self.refresh_button_toolbar.setToolTip("Refrescar")
         self.refresh_button_toolbar.clicked.connect(self.browser.reload)
-
-        #llamado a la funcion para rotar iconos
         self.refresh_button_toolbar.installEventFilter(self)
-
+        
         # Botón de redirección url IA
         self.redirect_button_toolbar = QPushButton("")
         self.redirect_button_toolbar.setToolTip("Crear imágen con IA")
@@ -253,7 +257,7 @@ class MainWindow(QMainWindow):
         self.url_layout.addWidget(self.back_button)
         self.url_layout.addWidget(self.forward_button)
         self.url_layout.addWidget(self.refresh_button)
-        self.url_layout.addWidget(self.config_button)
+        self.url_layout.addWidget(self.tools_button)
         self.url_layout.addWidget(self.url_bar)
         self.url_layout.addWidget(self.toggle_toolbar_button)
 
@@ -294,7 +298,11 @@ class MainWindow(QMainWindow):
                 self.refresh_button_toolbar.setIcon(QIcon(self.recharge_icon_path))
             elif obj == self.maps_redirect_button_toolbar:
                 self.maps_redirect_button_toolbar.setIcon(QIcon(self.map_c_icon_path))
-
+            elif obj == self.tools_button:
+                self.tools_button.setIcon(QIcon(self.tools_n_icon_path))
+            elif obj == self.toggle_toolbar_button:
+                self.toggle_toolbar_button.setIcon(QIcon(self.visible_icon_path))
+                
         elif event.type() == QEvent.Type.Leave:
             if obj == self.instagram_redirect_button_toolbar:
                 self.instagram_redirect_button_toolbar.setIcon(QIcon(self.instagram_n_icon_path))
@@ -302,15 +310,45 @@ class MainWindow(QMainWindow):
                 self.refresh_button_toolbar.setIcon(QIcon(self.recharge_n_icon_path))
             elif obj == self.maps_redirect_button_toolbar:
                 self.maps_redirect_button_toolbar.setIcon(QIcon(self.map_n_icon_path))
+            elif obj == self.tools_button:
+                self.tools_button.setIcon(QIcon(self.tools_icon_path))
+            elif obj == self.toggle_toolbar_button:
+                self.toggle_toolbar_button.setIcon(QIcon(self.hidden_icon_path))
         return super().eventFilter(obj, event)
+
+    def update_buttons_state(self, checkbox_states):
+        #ACTIVAR DESACTIVAR CON CHECKBOX LA BARRA DE CONFIGURACION || Este funciona
+        if(checkbox_states.get("Configuration", False) == False):
+            self.main_tool_bar.setVisible(False)
+        if(checkbox_states.get("Configuration", False) == True):
+            self.main_tool_bar.setVisible(True)
+        #ACTIVAR DESACTIVAR CON CHECKBOX INSTAGRAM || NO FUNCIONA!
+        if(checkbox_states.get("Instagram", False) == False):
+            self.instagram_redirect_button_toolbar.setVisible(False)
+            print("Estoy funcionando pero me chupa un huevo")
+        if(checkbox_states.get("Instagram", False) == True):
+            self.instagram_redirect_button_toolbar.setVisible(True)
+            print(", y ahora me chupa el otro")
 
 
     def abrirVentanaConfig(self):
         if self.secondary_window is None or not self.secondary_window.isVisible():
             style_sheet = self.apply_styles()
-            self.secondary_window = MainWindow2(style_sheet)
+            self.secondary_window = MainWindow2(style_sheet, self)
+            
+            # Debugging: Print checkbox states
+            initial_states = {
+                "Configuration": self.secondary_window.checkbox1.isChecked(),
+                "Crear Imagen IA": self.secondary_window.checkbox2.isChecked(),
+                "Instagram": self.secondary_window.checkbox3.isChecked(),
+                "Otra Opcion 1": self.secondary_window.checkbox4.isChecked(),
+                "Otra Opcion 2": self.secondary_window.checkbox5.isChecked(),
+                "Otra Opcion 3": self.secondary_window.checkbox6.isChecked()
+            }
+            
+            self.update_buttons_state(initial_states)
             main_window_pos = self.pos()
-            secondary_window_pos = QPoint(main_window_pos.x() + 50, main_window_pos.y()+100)
+            secondary_window_pos = QPoint(main_window_pos.x() + 50, main_window_pos.y() + 100)
             self.secondary_window.move(secondary_window_pos)
             self.secondary_window.show()
         else:
