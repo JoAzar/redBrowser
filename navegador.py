@@ -3,17 +3,12 @@ from PyQt6.QtGui import*
 from PyQt6.QtCore import*
 from PyQt6.QtWebEngineWidgets import*
 from PyQt6.QtWebEngineCore import*
+from color import*
 import os
 import sys
-
+import json
 
 # Perfil de navegador en modo incógnito.
-class IncognitoWebEngineProfile(QWebEngineProfile):
-    def __init__(self, name, parent=None):
-        super().__init__(name, parent)
-        self.setPersistentCookiesPolicy(QWebEngineProfile.PersistentCookiesPolicy.NoPersistentCookies)
-        self.setPersistentStoragePath("")
-
 class MainWindow2(QMainWindow):
     def __init__(self, style_sheet, main_window):
         super().__init__()
@@ -25,48 +20,24 @@ class MainWindow2(QMainWindow):
         layout = QVBoxLayout()
         central_widget = QWidget()
         self.setWindowTitle("CONFIGURACIONES")
-        self.resize(100, 50)
-        # Crear el QCheckBox
-        self.checkbox1 = QCheckBox()
-        self.checkbox1.setText("Configuration")
-        self.checkbox1.setCheckState(Qt.CheckState.Unchecked)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True) #Transparente
+        self.resize(300, 200)  # Ajuste del tamaño de la ventana
 
-        self.setWindowFlags(Qt.WindowType.FramelessWindowHint)  # Quitar el marco y la barra de título
-        #self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)  # Hacer que el fondo sea transparente
+        # Crear y añadir los QCheckBox al diseño
+        self.checkbox1 = QCheckBox("Configuration")
+        self.checkbox2 = QCheckBox("Crear Imagen IA")
+        self.checkbox3 = QCheckBox("Instagram")
+        self.checkbox4 = QCheckBox("Otra Opcion 1")
+        self.checkbox5 = QCheckBox("Otra Opcion 2")
+        self.checkbox6 = QCheckBox("Otra Opcion 3")
 
-        # Crear el QCheckBox
-        self.checkbox2 = QCheckBox()
-        self.checkbox2.setText("Crear Imagen IA")
-        self.checkbox2.setCheckState(Qt.CheckState.Unchecked)
+        layout.addWidget(self.checkbox1)
+        layout.addWidget(self.checkbox2)
+        layout.addWidget(self.checkbox3)
+        layout.addWidget(self.checkbox4)
+        layout.addWidget(self.checkbox5)
+        layout.addWidget(self.checkbox6)
 
-        # Crear el QCheckBox
-        self.checkbox3 = QCheckBox()
-        self.checkbox3.setText("Instagram")
-        self.checkbox3.setCheckState(Qt.CheckState.Unchecked)
-
-        # Crear el QCheckBox
-        self.checkbox4 = QCheckBox()
-        self.checkbox4.setText("Otra Opcion 1")
-        self.checkbox4.setCheckState(Qt.CheckState.Unchecked)
-
-        # Crear el QCheckBox
-        self.checkbox5 = QCheckBox()
-        self.checkbox5.setText("Otra Opcion 2")
-        self.checkbox5.setCheckState(Qt.CheckState.Unchecked)
-
-        # Crear el QCheckBox
-        self.checkbox6 = QCheckBox()
-        self.checkbox6.setText("Otra Opcion 3")
-        self.checkbox6.setCheckState(Qt.CheckState.Unchecked)
-        
-        # Añadir el QCheckBox al diseño
-        layout.addWidget(self.checkbox1, alignment=Qt.AlignmentFlag.AlignVCenter)
-        layout.addWidget(self.checkbox2, alignment=Qt.AlignmentFlag.AlignVCenter)
-        layout.addWidget(self.checkbox3, alignment=Qt.AlignmentFlag.AlignVCenter)
-        layout.addWidget(self.checkbox4, alignment=Qt.AlignmentFlag.AlignVCenter)
-        layout.addWidget(self.checkbox5, alignment=Qt.AlignmentFlag.AlignVCenter)
-        layout.addWidget(self.checkbox6, alignment=Qt.AlignmentFlag.AlignVCenter)
-        
         # Establecer el diseño en el widget central
         central_widget.setLayout(layout)
         self.setCentralWidget(central_widget)
@@ -99,132 +70,116 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        # PATHS
+        # Cargar los paths desde el archivo JSON
         base_dir = os.path.dirname(__file__)
-        self.back_icon_path = os.path.join(base_dir, 'icons', 'back.png')
-        self.back_n_icon_path = os.path.join(base_dir, 'icons', 'back_n.png')
+        with open(os.path.join(base_dir, 'paths.json'), 'r') as f:
+            paths = json.load(f)
 
-        self.forward_icon_path = os.path.join(base_dir, 'icons', 'forward.png')
-        self.forward_n_icon_path = os.path.join(base_dir, 'icons', 'forward_n.png')
-
-        self.browser_icon_path = os.path.join(base_dir, 'icons', 'iconoBrowser.ico')
-
-        self.recharge_icon_path = os.path.join(base_dir, 'icons', 'recharge.png')
-        self.recharge_n_icon_path = os.path.join(base_dir, 'icons', 'recharge_n.png')
-
-        homepage_path = os.path.join(base_dir, 'public/homepage.html')
-
-        self.config_icon_path = os.path.join(base_dir, 'icons', 'config.png')
-
-        self.visible_icon_path = os.path.join(base_dir, 'icons', 'config.png')
-        self.hidden_icon_path = os.path.join(base_dir, 'icons', 'config_n.png')
-
-        self.url_icon_path = os.path.join(base_dir, 'icons', 'redirect.png')
-        self.url_n_icon_path = os.path.join(base_dir, 'icons', 'redirect_n.png')
-
-        self.url_icon_path_home = os.path.join(base_dir, 'icons', 'home.png')
-        self.url_n_icon_path_home = os.path.join(base_dir, 'icons', 'home_n.png')
-
-        self.modo_claro_icon_path = os.path.join(base_dir, 'icons', 'claro.png')
-        self.modo_oscuro_icon_path = os.path.join(base_dir, 'icons', 'oscuro.png')
-        self.modo_pink_icon_path = os.path.join(base_dir, 'icons', 'pink.png')
-
-        self.instagram_n_icon_path = os.path.join(base_dir, 'icons', 'instagram_n.png')
-        self.instagram_c_icon_path = os.path.join(base_dir, 'icons', 'instagram_c.png')
-
-        self.map_n_icon_path = os.path.join(base_dir, 'icons', 'map_n.png')     #FALTAN LOS BOTONES
-        self.map_c_icon_path = os.path.join(base_dir, 'icons', 'map_c.png')
-
-        self.tools_icon_path = os.path.join(base_dir, 'icons', 'configuracion.png')
-        self.tools_n_icon_path = os.path.join(base_dir, 'icons', 'configuracion_n.png')
-        
-
-        # Configurar perfil del navegador en modo incógnito
-        self.profile = IncognitoWebEngineProfile("IncognitoProfile")
+        self.mappage_path = os.path.join(base_dir, paths['mappage'])
+        self.homepage_path = os.path.join(base_dir, paths['homepage'])
+        self.back_icon_path = os.path.join(base_dir, paths['back'])
+        self.back_n_icon_path = os.path.join(base_dir, paths['back_n'])
+        self.forward_icon_path = os.path.join(base_dir, paths['forward'])
+        self.forward_n_icon_path = os.path.join(base_dir, paths['forward_n'])
+        self.browser_icon_path = os.path.join(base_dir, paths['browser'])
+        self.recharge_icon_path = os.path.join(base_dir, paths['recharge'])
+        self.recharge_n_icon_path = os.path.join(base_dir, paths['recharge_n'])
+        self.tools_icon_path = os.path.join(base_dir, paths['tools'])
+        self.tools_n_icon_path = os.path.join(base_dir, paths['tools_n'])
+        self.url_icon_path = os.path.join(base_dir, paths['url'])
+        self.url_n_icon_path = os.path.join(base_dir, paths['url_n'])
+        self.home_icon_path = os.path.join(base_dir, paths['home'])
+        self.home_n_icon_path = os.path.join(base_dir, paths['home_n'])
+        self.modo_claro_icon_path = os.path.join(base_dir, paths['modo_claro'])
+        self.modo_oscuro_icon_path = os.path.join(base_dir, paths['modo_oscuro'])
+        self.instagram_n_icon_path = os.path.join(base_dir, paths['instagram_n'])
+        self.instagram_c_icon_path = os.path.join(base_dir, paths['instagram_c'])
+        self.map_n_icon_path = os.path.join(base_dir, paths['map_n'])
+        self.map_c_icon_path = os.path.join(base_dir, paths['map_c'])
 
         # Configurar vista del navegador
         self.browser = QWebEngineView()
-        self.browser.setUrl(QUrl.fromLocalFile(homepage_path))
 
         self.url_bar = QLineEdit()
-        #self.url_bar.returnPressed.connect(self.navigate_to_url)
         self.browser.urlChanged.connect(self.update_url_bar)
+
+        # Cargar la página de inicio
+        self.load_homepage()
 
         #inicio la ventana del config
         self.secondary_window = None
 
         self.back_button = QPushButton()
-        self.back_button.setIcon(QIcon(self.back_icon_path))
+        self.back_button.setIcon(QIcon(self.back_n_icon_path))
         self.back_button.setToolTip("Ir hacia atrás")
         self.back_button.clicked.connect(self.browser.back)
+        self.back_button.installEventFilter(self)
 
         self.forward_button = QPushButton()
-        self.forward_button.setIcon(QIcon(self.forward_icon_path))
+        self.forward_button.setIcon(QIcon(self.forward_n_icon_path))
         self.forward_button.setToolTip("Ir hacia adelante")
         self.forward_button.clicked.connect(self.browser.forward)
+        self.forward_button.installEventFilter(self)
 
         self.refresh_button = QPushButton()
-        self.refresh_button.setIcon(QIcon(self.recharge_icon_path))
+        self.refresh_button.setIcon(QIcon(self.recharge_n_icon_path))
         self.refresh_button.setToolTip("Refrescar")
         self.refresh_button.clicked.connect(self.browser.reload)
+        self.refresh_button.installEventFilter(self)
+
+        # Botón de redirección url HOMEPAGE
+        self.home_button = QPushButton()
+        self.home_button.setIcon(QIcon(self.home_n_icon_path))
+        self.home_button.setToolTip("Volver al Inicio")
+        self.home_button.clicked.connect(self.redirect_to_page_home)
+        self.home_button.installEventFilter(self)
 
         #tools de navegador
         self.tools_button = QPushButton()
         self.tools_button.setIcon(QIcon(self.tools_icon_path))
-        self.tools_button.setToolTip("Tools")
+        self.tools_button.setToolTip("Accesos directos")
         self.tools_button.clicked.connect(self.abrirVentanaConfig)
         self.tools_button.installEventFilter(self)
-
-        # Botón para mostrar/ocultar la barra de herramientas
-        self.toggle_toolbar_button = QPushButton()
-        self.toggle_toolbar_button.setIcon(QIcon(self.config_icon_path))
-        self.toggle_toolbar_button.setToolTip("Herramientas")
-        self.toggle_toolbar_button.clicked.connect(self.toggle_tool_bar)
-        self.toggle_toolbar_button.installEventFilter(self)
 
         # Botón de cambio de tema
         self.theme_button = QPushButton("")
         self.theme_button.setToolTip("Cambiar color")
-        self.theme_button.clicked.connect(self.toggle_theme)
 
-        # Botón de refrescar página en toolbar oculta
-        self.refresh_button_toolbar = QPushButton("")
-        self.refresh_button_toolbar.setIcon(QIcon(self.recharge_n_icon_path))
-        self.refresh_button_toolbar.setToolTip("Refrescar")
-        self.refresh_button_toolbar.clicked.connect(self.browser.reload)
-        self.refresh_button_toolbar.installEventFilter(self)
+        #Inicializar estado del color de tema
+        self.dark_mode = False
+
+        #Crear una instancia de ColorManager
+        self.color_manager = ColorManager(
+            widget=self,
+            theme_button=self.theme_button,
+            modo_claro_icon_path="path_to_light_mode_icon.png",
+            modo_oscuro_icon_path="path_to_dark_mode_icon.png"
+        )
+
+        #Conectar el clic del botón al método toggle_theme
+        self.theme_button.clicked.connect(self.color_manager.toggle_theme)
         
         # Botón de redirección url IA
         self.redirect_button_toolbar = QPushButton("")
         self.redirect_button_toolbar.setToolTip("Crear imágen con IA")
         self.redirect_button_toolbar.setIcon(QIcon(self.url_icon_path))
         self.redirect_button_toolbar.clicked.connect(self.redirect_to_page)
+        self.redirect_button_toolbar.installEventFilter(self)
 
         # Botón de redirección url MAPS
         self.maps_redirect_button_toolbar = QPushButton("")
         self.maps_redirect_button_toolbar.setToolTip("Ver Mapas")
         self.maps_redirect_button_toolbar.setIcon(QIcon(self.map_n_icon_path))
         self.maps_redirect_button_toolbar.clicked.connect(self.redirect_to_maps)
-
-        # Botón de redirección url HOMEPAGE
-        self.home_redirect_button_toolbar = QPushButton("")
-        self.home_redirect_button_toolbar.setToolTip("Volver al Inicio")
-        self.home_redirect_button_toolbar.setIcon(QIcon(self.url_icon_path_home))
-        self.home_redirect_button_toolbar.clicked.connect(self.redirect_to_page_home)
+        self.maps_redirect_button_toolbar.installEventFilter(self)
 
         #Botón de redirección a Instagram Color
         self.instagram_redirect_button_toolbar = QPushButton("")
         self.instagram_redirect_button_toolbar.setToolTip("Ir a Instagram")
         self.instagram_redirect_button_toolbar.setIcon(QIcon(self.instagram_c_icon_path))
         self.instagram_redirect_button_toolbar.clicked.connect(self.redirect_to_insta)
-
-        #llamado a la funcion para rotar iconos
-        self.instagram_redirect_button_toolbar.installEventFilter(self)
-
-        # Inicializar estado del color de tema
-        self.dark_mode = False
-        self.pink_mode = False 
-
+        self.instagram_redirect_button_toolbar.installEventFilter(self) #llamado a la funcion para rotar iconos || solo para iconos de barra tools
+        
         # Crear la barra de herramientas principal
         self.main_tool_bar = QToolBar("Main", self)
         self.main_tool_bar.setObjectName("MainToolBar")
@@ -232,20 +187,19 @@ class MainWindow(QMainWindow):
 
         # Agregar el botón de cambio de tema a la barra de herramientas
         self.main_tool_bar.addWidget(self.theme_button)                     #Añadir el botones a la barra de herramientas
-        self.main_tool_bar.addWidget(self.refresh_button_toolbar)
         self.main_tool_bar.addWidget(self.redirect_button_toolbar)
-        self.main_tool_bar.addWidget(self.home_redirect_button_toolbar)
+        #poner otros botones del toolbar acá
         self.main_tool_bar.addWidget(self.instagram_redirect_button_toolbar)
         self.main_tool_bar.addWidget(self.maps_redirect_button_toolbar)
         
         # La barra de herramientas inicia visible
-        self.main_tool_bar.setVisible(True)
+        self.main_tool_bar.setVisible(False)
 
         # Crear barra de título personalizada
         self.create_title_bar()
 
         # Aplicar estilos iniciales
-        self.apply_styles()
+        self.color_manager.apply_styles()
 
         # Configurar diseño
         self.main_layout = QHBoxLayout()                    # Usar un diseño horizontal para organizar la barra de herramientas y el contenido
@@ -255,11 +209,11 @@ class MainWindow(QMainWindow):
         self.url_layout = QHBoxLayout()
 
         self.url_layout.addWidget(self.back_button)
+        self.url_layout.addWidget(self.home_button)
         self.url_layout.addWidget(self.forward_button)
         self.url_layout.addWidget(self.refresh_button)
         self.url_layout.addWidget(self.tools_button)
         self.url_layout.addWidget(self.url_bar)
-        self.url_layout.addWidget(self.toggle_toolbar_button)
 
         self.content_layout.addWidget(self.title_bar)       # Agregar la barra de título
         self.content_layout.addLayout(self.url_layout)      # La disposición de URL y el botón de configuración
@@ -277,43 +231,46 @@ class MainWindow(QMainWindow):
         self.container = QWidget()
         self.container.setLayout(self.main_layout)
         self.setCentralWidget(self.container)
-
         app.setStyle("Fusion")
         self.setWindowIcon(QIcon(self.browser_icon_path))
         self.setWindowTitle("Red Browser")
-
         largo = 1024
         ancho = 860
         self.resize(largo, ancho)
-
-        # Configurar opciones de privacidad
-        self.configure_privacy_settings()
-
 
     def eventFilter(self, obj, event):
         if event.type() == QEvent.Type.Enter:
             if obj == self.instagram_redirect_button_toolbar:
                 self.instagram_redirect_button_toolbar.setIcon(QIcon(self.instagram_c_icon_path))
-            elif obj == self.refresh_button_toolbar:
-                self.refresh_button_toolbar.setIcon(QIcon(self.recharge_icon_path))
+            elif obj == self.refresh_button:
+                self.refresh_button.setIcon(QIcon(self.recharge_icon_path))
             elif obj == self.maps_redirect_button_toolbar:
                 self.maps_redirect_button_toolbar.setIcon(QIcon(self.map_c_icon_path))
             elif obj == self.tools_button:
-                self.tools_button.setIcon(QIcon(self.tools_n_icon_path))
-            elif obj == self.toggle_toolbar_button:
-                self.toggle_toolbar_button.setIcon(QIcon(self.visible_icon_path))
-                
+                self.tools_button.setIcon(QIcon(self.tools_icon_path))
+            elif obj == self.forward_button:
+                self.forward_button.setIcon(QIcon(self.forward_icon_path))
+            elif obj == self.back_button:
+                self.back_button.setIcon(QIcon(self.back_icon_path))
+            elif obj == self.home_button:
+                self.home_button.setIcon(QIcon(self.home_icon_path))
+
         elif event.type() == QEvent.Type.Leave:
             if obj == self.instagram_redirect_button_toolbar:
                 self.instagram_redirect_button_toolbar.setIcon(QIcon(self.instagram_n_icon_path))
-            elif obj == self.refresh_button_toolbar:
-                self.refresh_button_toolbar.setIcon(QIcon(self.recharge_n_icon_path))
+            elif obj == self.refresh_button:
+                self.refresh_button.setIcon(QIcon(self.recharge_n_icon_path))
             elif obj == self.maps_redirect_button_toolbar:
                 self.maps_redirect_button_toolbar.setIcon(QIcon(self.map_n_icon_path))
             elif obj == self.tools_button:
-                self.tools_button.setIcon(QIcon(self.tools_icon_path))
-            elif obj == self.toggle_toolbar_button:
-                self.toggle_toolbar_button.setIcon(QIcon(self.hidden_icon_path))
+                self.tools_button.setIcon(QIcon(self.tools_n_icon_path))
+            elif obj == self.forward_button:
+                self.forward_button.setIcon(QIcon(self.forward_n_icon_path))
+            elif obj == self.back_button:
+                self.back_button.setIcon(QIcon(self.back_n_icon_path))
+
+            elif obj == self.home_button:
+                self.home_button.setIcon(QIcon(self.home_n_icon_path))
         return super().eventFilter(obj, event)
 
     def update_buttons_state(self, checkbox_states):
@@ -322,21 +279,11 @@ class MainWindow(QMainWindow):
             self.main_tool_bar.setVisible(False)
         if(checkbox_states.get("Configuration", False) == True):
             self.main_tool_bar.setVisible(True)
-        #ACTIVAR DESACTIVAR CON CHECKBOX INSTAGRAM || NO FUNCIONA!
-        if(checkbox_states.get("Instagram", False) == False):
-            self.instagram_redirect_button_toolbar.setVisible(False)
-            print("Estoy funcionando pero me chupa un huevo")
-        if(checkbox_states.get("Instagram", False) == True):
-            self.instagram_redirect_button_toolbar.setVisible(True)
-            print(", y ahora me chupa el otro")
-
 
     def abrirVentanaConfig(self):
         if self.secondary_window is None or not self.secondary_window.isVisible():
-            style_sheet = self.apply_styles()
+            style_sheet = self.color_manager.apply_styles()
             self.secondary_window = MainWindow2(style_sheet, self)
-            
-            # Debugging: Print checkbox states
             initial_states = {
                 "Configuration": self.secondary_window.checkbox1.isChecked(),
                 "Crear Imagen IA": self.secondary_window.checkbox2.isChecked(),
@@ -344,8 +291,7 @@ class MainWindow(QMainWindow):
                 "Otra Opcion 1": self.secondary_window.checkbox4.isChecked(),
                 "Otra Opcion 2": self.secondary_window.checkbox5.isChecked(),
                 "Otra Opcion 3": self.secondary_window.checkbox6.isChecked()
-            }
-            
+            }  
             self.update_buttons_state(initial_states)
             main_window_pos = self.pos()
             secondary_window_pos = QPoint(main_window_pos.x() + 50, main_window_pos.y() + 100)
@@ -368,8 +314,11 @@ class MainWindow(QMainWindow):
             self.secondary_window.close()
             self.secondary_window = None
 
+    def load_homepage(self):
+        self.browser.setUrl(QUrl.fromLocalFile(self.homepage_path))
+
     def redirect_to_maps(self):
-        new_url = QUrl.fromLocalFile(os.path.join(os.path.dirname(__file__), 'public/map.html'))
+        new_url = QUrl.fromLocalFile(self.mappage_path)
         self.browser.setUrl(new_url)
 
     def redirect_to_page(self):
@@ -381,7 +330,7 @@ class MainWindow(QMainWindow):
         self.browser.setUrl(QUrl(new_url))
 
     def redirect_to_page_home(self):
-        new_url = QUrl.fromLocalFile(os.path.join(os.path.dirname(__file__), 'public/homepage.html'))
+        new_url = QUrl.fromLocalFile(self.homepage_path)
         self.browser.setUrl(new_url)
 
     def toggle_tool_bar(self):  # Alternar visibilidad de la barra de herramientas principal
@@ -425,164 +374,11 @@ class MainWindow(QMainWindow):
         settings.setAttribute(QWebEngineSettings.WebAttribute.ShowScrollBars, True)
         settings.setAttribute(QWebEngineSettings.WebAttribute.DnsPrefetchEnabled, True)
         settings.setAttribute(QWebEngineSettings.WebAttribute.PdfViewerEnabled, True)
-        
-    def navigate_to_url(self):
-        url = self.url_bar.text()
-        if not url.startswith('http'):
-            url = 'https://' + url
-        self.browser.setUrl(QUrl(url))
 
     # Actualiza la barra de direcciones con la URL actual del navegador.
     def update_url_bar(self, q):
         self.url_bar.setText(q.toString())
-
-    # Aplica estilos personalizados
-    def apply_styles(self):
-        style_sheet = ""
-        if self.pink_mode:
-            style_sheet = """
-                QMainWindow {
-                    background-color: #ff61c5;
-                }
-                QToolTip {
-                    background-color: white;
-                    color: black;
-                    border: 1px solid black;
-                }
-                QToolBar {
-                    background-color: #ffabe0;
-                }
-                QWidget {
-                    background-color: #ffabe0;
-                    color: #78596e;
-                }
-                QPushButton {
-                    background-color: #ffabe0;
-                    color: #eee;
-                    border: 1px solid #78596e;
-                    padding: 5px;
-                    border-radius: 5px;
-                    min-width: 10px;
-                    min-height: 10px;
-                }
-                QPushButton:hover {
-                    background-color: #ffcfcf;
-                }
-                QPushButton:pressed {
-                    background-color: #ffcfcf;
-                }
-                QLineEdit {
-                    padding: 5px;
-                    border: 1px solid #78596e;
-                    border-radius: 5px;
-                    color: #78596e;
-                    background-color: #f5c5c5;
-                }
-                QWidget#title_bar {
-                    background-color: #ffabe0;
-                }
-            """
-            self.theme_button.setIcon(QIcon(self.modo_oscuro_icon_path))
-        elif self.dark_mode:
-            style_sheet = """
-                QMainWindow {
-                    background-color: #131313;
-                }
-                QToolTip {
-                    background-color: white;
-                    color: #eee;
-                    border: 1px solid black;
-                    padding: 5px;
-                    border-radius: 30px;
-                }
-                QWidget {
-                    background-color: #131313;
-                    color: #eee;
-                }
-                QPushButton {
-                    background-color: #131313;
-                    color: #eee;
-                    border: 1px solid #555;
-                    padding: 5px;
-                    border-radius: 5px;
-                    min-width: 10px;
-                    min-height: 10px;
-                }
-                QPushButton:hover {
-                    background-color: #ffffff;
-                    color: black;
-                }
-                QPushButton:pressed {
-                    background-color: #ffffff;
-                }
-                QLineEdit {
-                    padding: 5px;
-                    border: 1px solid #555;
-                    border-radius: 5px;
-                    color: #eee;
-                    background-color: #333;
-                }
-                QWidget#title_bar {
-                    background-color: #131313;
-                }
-            """
-            self.theme_button.setIcon(QIcon(self.modo_claro_icon_path))
-        else:
-            style_sheet = """
-                QMainWindow {
-                    background-color: #000;
-                }
-                QToolTip {
-                    background-color: white;
-                    color: black;
-                    border: 1px solid black;
-                }
-                QWidget {
-                    background-color: #fff;
-                    color: #000;
-                }             
-                QPushButton {
-                    background-color: #fff;
-                    color: #000;
-                    border: 1px solid #ccc;
-                    padding: 5px;
-                    border-radius: 5px;
-                    min-width: 10px;
-                    min-height: 10px;
-                }
-                QPushButton:hover {
-                    background-color: #686868;
-                    color: #ffffff;
-                }
-                QLineEdit {
-                    padding: 5px;
-                    border: 1px solid #ccc;
-                    border-radius: 5px;
-                    color: #000;
-                    background-color: #fff;
-                }
-                QWidget#title_bar {
-                    background-color: #fff;
-                }
-            """
-            self.theme_button.setIcon(QIcon(self.modo_pink_icon_path))
-
-        self.setStyleSheet(style_sheet)
-        return style_sheet
-
-    # Cambia entre modo claro y oscuro.
-    def toggle_theme(self):
-        if self.pink_mode:
-            self.pink_mode = False
-            self.dark_mode = True
-        elif self.dark_mode:
-            self.dark_mode = False
-        else:
-            self.dark_mode = False
-            self.pink_mode = True
-
-        self.apply_styles()
-
+    
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = MainWindow()

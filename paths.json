@@ -1,0 +1,23 @@
+{
+    "mappage": "public/map.html",
+    "homepage": "public/homepage.html",
+    "back": "icons/back.png",
+    "back_n": "icons/back_n.png",
+    "forward": "icons/forward.png",
+    "forward_n": "icons/forward_n.png",
+    "browser": "icons/iconoBrowser.ico",
+    "recharge": "icons/recharge.png",
+    "recharge_n": "icons/recharge_n.png",
+    "tools": "icons/config.png",
+    "tools_n": "icons/config_n.png",
+    "url": "icons/redirect.png",
+    "url_n": "icons/redirect_n.png",
+    "home": "icons/home.png",
+    "home_n": "icons/home_n.png",
+    "modo_claro": "icons/claro.png",
+    "modo_oscuro": "icons/oscuro.png",
+    "instagram_n": "icons/instagram_n.png",
+    "instagram_c": "icons/instagram_c.png",
+    "map_n": "icons/map_n.png",
+    "map_c": "icons/map_c.png"
+}
